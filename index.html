@@ -1,0 +1,1498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Intelligent Relations API</title>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="description" content="Integration guide for the Intelligent Relations API.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --paper:#fbfaf8; --paper-2:#f4f2ee; --paper-3:#eceae5;
+  --ink:#14171f; --ink-2:#3b4150; --ink-3:#6b6f7a;
+  --rule:#dedbd4; --rule-2:#cbc7bd;
+  --accent:#1f6f6b; --accent-2:#17544f; --accent-wash:#eaf4f2;
+  --get:#2f6f9f; --post:#2e7d5b; --patch:#9a6b1e; --delete:#a63d3d;
+  --code-bg:#f5f3ef; --code-ink:#22262f;
+  --s:#2e7d5b; --k:#3a5a8c; --n:#9a6b1e; --b:#7a4ea3; --c:#8a8f99;
+  --maxw:74ch;
+  --serif:Charter,"Bitstream Charter","Sitka Text",Cambria,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#12141a; --paper-2:#181b23; --paper-3:#1f232c;
+    --ink:#e8e6e1; --ink-2:#b9bcc4; --ink-3:#8b8f99;
+    --rule:#2a2e38; --rule-2:#39404c;
+    --accent:#6fc4bb; --accent-2:#8fd6cd; --accent-wash:#152625;
+    --get:#7fb0d8; --post:#79c8a0; --patch:#d4a656; --delete:#e08a8a;
+    --code-bg:#171a21; --code-ink:#d8d6d1;
+    --s:#79c8a0; --k:#8fb3e0; --n:#d4a656; --b:#c39ae0; --c:#767b86;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12141a; --paper-2:#181b23; --paper-3:#1f232c;
+  --ink:#e8e6e1; --ink-2:#b9bcc4; --ink-3:#8b8f99;
+  --rule:#2a2e38; --rule-2:#39404c;
+  --accent:#6fc4bb; --accent-2:#8fd6cd; --accent-wash:#152625;
+  --get:#7fb0d8; --post:#79c8a0; --patch:#d4a656; --delete:#e08a8a;
+  --code-bg:#171a21; --code-ink:#d8d6d1;
+  --s:#79c8a0; --k:#8fb3e0; --n:#d4a656; --b:#c39ae0; --c:#767b86;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.layout{display:grid; grid-template-columns:16.5rem minmax(0,1fr); gap:0; align-items:start}
+/* ---------- sidebar ---------- */
+.rail{
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  border-right:1px solid var(--rule); background:var(--paper-2);
+  padding:2rem 1.25rem 3rem; display:flex; flex-direction:column; gap:1.5rem;
+}
+.brand{display:flex; flex-direction:column; gap:.35rem}
+.brand .bt{font-family:var(--serif); font-size:1.18rem; font-weight:600; letter-spacing:-.01em; line-height:1.25}
+.brand .bs{font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3)}
+.rail nav ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.1rem}
+.rail nav a{
+  display:flex; gap:.6rem; align-items:baseline; text-decoration:none;
+  color:var(--ink-2); padding:.32rem .5rem; border-radius:3px;
+  font-size:.845rem; line-height:1.35; border-left:2px solid transparent;
+}
+.rail nav a:hover{background:var(--paper-3); color:var(--ink)}
+.rail nav a.on{color:var(--accent); border-left-color:var(--accent); background:var(--accent-wash); font-weight:600}
+.tnum{font-family:var(--mono); font-size:.72rem; color:var(--ink-3); min-width:1.05rem; font-variant-numeric:tabular-nums}
+.rail nav a.on .tnum{color:var(--accent)}
+.ttext{flex:1}
+.themebtn{
+  margin-top:auto; background:none; border:1px solid var(--rule-2); color:var(--ink-3);
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase;
+  padding:.5rem .7rem; border-radius:3px; cursor:pointer; text-align:left;
+}
+.themebtn:hover{color:var(--ink); border-color:var(--ink-3)}
+/* ---------- content ---------- */
+main{padding:3.5rem 3.5rem 8rem; min-width:0; max-width:calc(var(--maxw) + 14rem)}
+h1{
+  font-family:var(--serif); font-size:2.6rem; line-height:1.12; letter-spacing:-.022em;
+  font-weight:600; margin:0 0 1.4rem; text-wrap:balance; max-width:22ch;
+}
+h2{
+  font-family:var(--serif); font-size:1.72rem; line-height:1.22; letter-spacing:-.016em;
+  font-weight:600; margin:4rem 0 1.1rem; padding-top:1.6rem;
+  border-top:1px solid var(--rule); text-wrap:balance;
+  display:flex; gap:.75rem; align-items:baseline; scroll-margin-top:1.5rem;
+}
+h2:first-of-type{margin-top:2.5rem}
+.secnum{
+  font-family:var(--mono); font-size:.82rem; font-weight:500; color:var(--accent);
+  border:1px solid var(--rule-2); border-radius:3px; padding:.12rem .42rem;
+  letter-spacing:0; flex:none; position:relative; top:-.22em;
+}
+h3{
+  font-family:var(--serif); font-size:1.24rem; line-height:1.3; letter-spacing:-.011em;
+  font-weight:600; margin:2.6rem 0 .8rem; text-wrap:balance; scroll-margin-top:1.5rem;
+}
+h4{font-size:1rem; font-weight:650; margin:2rem 0 .7rem; letter-spacing:-.004em; scroll-margin-top:1.5rem}
+h5{font-size:.9rem; font-weight:650; margin:1.5rem 0 .5rem; color:var(--ink-2)}
+h4.endpoint{
+  display:flex; flex-wrap:wrap; gap:.55rem; align-items:center;
+  background:var(--paper-2); border:1px solid var(--rule);
+  border-left:3px solid var(--accent);
+  padding:.7rem .9rem; border-radius:4px; margin:2.4rem 0 .9rem;
+}
+.method{
+  font-family:var(--mono); font-size:.68rem; font-weight:700; letter-spacing:.07em;
+  padding:.2rem .45rem; border-radius:3px; color:#fff; flex:none;
+}
+.m-get{background:var(--get)} .m-post{background:var(--post)}
+.m-patch{background:var(--patch)} .m-delete{background:var(--delete)}
+.m-put{background:var(--patch)}
+h4.endpoint .path{
+  font-family:var(--mono); font-size:.875rem; font-weight:600;
+  background:none; border:none; padding:0; color:var(--ink);
+}
+.ep-purpose{
+  flex-basis:100%; font-weight:400; font-size:.86rem; color:var(--ink-3);
+  font-family:var(--sans); letter-spacing:0;
+}
+p{margin:0 0 1rem; max-width:var(--maxw)}
+ul,ol{margin:0 0 1.15rem; padding-left:1.35rem; max-width:var(--maxw)}
+li{margin:.32rem 0}
+li>ul,li>ol{margin:.32rem 0}
+a{color:var(--accent); text-decoration-thickness:1px; text-underline-offset:2px}
+a:hover{color:var(--accent-2)}
+strong{font-weight:650; color:var(--ink)}
+hr{border:none; border-top:1px solid var(--rule); margin:2.5rem 0; max-width:var(--maxw)}
+code{
+  font-family:var(--mono); font-size:.855em; background:var(--paper-3);
+  padding:.1em .32em; border-radius:3px; color:var(--code-ink);
+  border:1px solid var(--rule); white-space:nowrap;
+}
+/* ---------- code blocks ---------- */
+.codewrap{position:relative; margin:0 0 1.3rem}
+.codelabel{
+  position:absolute; top:0; right:0; font-family:var(--mono); font-size:.62rem;
+  letter-spacing:.09em; color:var(--ink-3); background:var(--paper-3);
+  border-left:1px solid var(--rule); border-bottom:1px solid var(--rule);
+  padding:.2rem .5rem; border-radius:0 4px 0 4px; z-index:1;
+}
+pre.code{
+  margin:0; background:var(--code-bg); border:1px solid var(--rule);
+  border-radius:4px; padding:1rem 1.1rem; overflow-x:auto;
+  font-family:var(--mono); font-size:.815rem; line-height:1.6; color:var(--code-ink);
+}
+pre.code code{background:none; border:none; padding:0; font-size:inherit; white-space:pre}
+pre.code .k{color:var(--k)} pre.code .s{color:var(--s)}
+pre.code .n{color:var(--n)} pre.code .b{color:var(--b); font-weight:600}
+pre.code .c{color:var(--c); font-style:italic}
+pre.code .m{color:var(--post); font-weight:700}
+pre.code .u{color:var(--ink); font-weight:600}
+/* ---------- tables ---------- */
+.tablewrap{overflow-x:auto; margin:0 0 1.4rem; border:1px solid var(--rule); border-radius:4px}
+table{border-collapse:collapse; width:100%; font-size:.855rem; line-height:1.5}
+thead th{
+  text-align:left; font-family:var(--mono); font-size:.68rem; font-weight:600;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3);
+  background:var(--paper-2); padding:.6rem .8rem; border-bottom:1px solid var(--rule-2);
+  white-space:nowrap;
+}
+td{padding:.55rem .8rem; border-bottom:1px solid var(--rule); vertical-align:top;
+   font-variant-numeric:tabular-nums}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:var(--paper-2)}
+td code{white-space:nowrap; font-size:.82em}
+td:first-child{white-space:nowrap}
+/* backing badges */
+.bk{font-family:var(--mono); font-size:.66rem; font-weight:700; letter-spacing:.06em;
+    padding:.14rem .42rem; border-radius:3px; white-space:nowrap; border:1px solid transparent}
+.bk-exists{background:var(--post); color:#fff}
+.bk-wrapper{background:var(--patch); color:#fff}
+.bk-new{background:var(--delete); color:#fff}
+/* endpoint metadata strip: headerless key/value */
+.tablewrap.meta{max-width:var(--maxw); background:var(--paper-2)}
+.tablewrap.meta td:first-child{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--ink-3); width:11rem; font-weight:600;
+}
+.tablewrap.meta tbody tr:nth-child(even){background:transparent}
+.tablewrap.meta td{padding:.45rem .8rem}
+/* ---------- exposure notes ---------- */
+aside.note{
+  border-left:3px solid var(--accent); background:var(--accent-wash);
+  padding:.95rem 1.1rem; margin:1.5rem 0; border-radius:0 4px 4px 0;
+  max-width:var(--maxw); font-size:.9rem;
+}
+aside.note p{margin:0 0 .6rem}
+aside.note p:last-child{margin-bottom:0}
+aside.note ul{margin:.5rem 0 0; font-size:.9rem}
+aside.note strong{color:var(--ink)}
+/* ---------- responsive ---------- */
+@media (max-width:1020px){
+  .layout{grid-template-columns:1fr}
+  .rail{
+    position:static; height:auto; border-right:none;
+    border-bottom:1px solid var(--rule); padding:1.25rem 1.5rem;
+  }
+  .rail nav ol{display:grid; grid-template-columns:repeat(auto-fill,minmax(13rem,1fr)); gap:.1rem}
+  .themebtn{margin-top:1rem; align-self:flex-start}
+  main{padding:2rem 1.5rem 5rem}
+  h1{font-size:2rem}
+  h2{font-size:1.45rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="layout">
+<aside class="rail">
+  <div class="brand">
+    <span class="bt">Intelligent Relations API</span>
+    <span class="bs">v1 &middot; Integration guide</span>
+  </div>
+  <nav><ol><li><a href="#contents"><span class="tnum">&nbsp;</span><span class="ttext">Contents</span></a></li>
+<li><a href="#1-core-concepts"><span class="tnum">1</span><span class="ttext">Core concepts</span></a></li>
+<li><a href="#2-getting-started"><span class="tnum">2</span><span class="ttext">Getting started</span></a></li>
+<li><a href="#3-authentication-and-scopes"><span class="tnum">3</span><span class="ttext">Authentication and scopes</span></a></li>
+<li><a href="#4-conventions"><span class="tnum">4</span><span class="ttext">Conventions</span></a></li>
+<li><a href="#5-timing-and-long-running-work"><span class="tnum">5</span><span class="ttext">Timing and long-running work</span></a></li>
+<li><a href="#6-endpoint-reference"><span class="tnum">6</span><span class="ttext">Endpoint reference</span></a></li>
+<li><a href="#7-notifications"><span class="tnum">7</span><span class="ttext">Notifications</span></a></li>
+<li><a href="#8-connecting-a-mailbox"><span class="tnum">8</span><span class="ttext">Connecting a mailbox</span></a></li>
+<li><a href="#9-journalist-data-sourcing-and-verification"><span class="tnum">9</span><span class="ttext">Journalist data: sourcing and verification</span></a></li>
+<li><a href="#10-privacy-and-data-handling"><span class="tnum">10</span><span class="ttext">Privacy and data handling</span></a></li>
+<li><a href="#11-integration-recipes"><span class="tnum">11</span><span class="ttext">Integration recipes</span></a></li>
+<li><a href="#12-availability-and-roadmap"><span class="tnum">12</span><span class="ttext">Availability and roadmap</span></a></li>
+<li><a href="#13-support"><span class="tnum">13</span><span class="ttext">Support</span></a></li>
+<li><a href="#changelog"><span class="tnum">&nbsp;</span><span class="ttext">Changelog</span></a></li></ol></nav>
+  <button class="themebtn" id="themebtn" type="button">Dark theme</button>
+</aside>
+<main><h1>Intelligent Relations API</h1>
+<p><strong>Version</strong> <code>v1</code> <strong>Base URL</strong> <code>https://{host}/api/v1</code> <strong>Last updated</strong> 18 August 2026</p>
+<p>Build media-relations workflows into your own product: discover relevant journalists, generate and personalise pitches, run outreach campaigns, distribute press releases, and handle replies — all rendered in your interface, with no dependency on ours.</p>
+<p>This document is written to be sufficient on its own. If you find something ambiguous, that is a fault in the document — tell us and we will fix it.</p>
+<hr>
+<h2 id="contents">Contents</h2>
+<ol>
+<li>Core concepts</li>
+<li>Getting started</li>
+<li>Authentication and scopes</li>
+<li>Conventions</li>
+<li>Timing and long-running work</li>
+<li>Endpoint reference</li>
+<li>Notifications</li>
+<li>Connecting a mailbox</li>
+<li>Journalist data: sourcing and verification</li>
+<li>Privacy and data handling</li>
+<li>Integration recipes</li>
+<li>Availability and roadmap</li>
+<li>Support</li>
+</ol>
+<hr>
+<h2 id="1-core-concepts"><span class="secnum">1</span>Core concepts</h2>
+<h3 id="1-1-the-object-model">1.1 The object model</h3>
+<div class="codewrap"><pre class="code"><code>Account ──────────── your organisation and its brand profile
+  │
+  ├── Company profile     name, website, positioning, themes, keywords
+  ├── Spokesperson        a named person available for quotes and interviews
+  ├── Competitor          a tracked competitor
+  ├── Analysis            brand analysis: positioning, messaging, PR plan
+  ├── Sender              a connected sending mailbox
+  ├── Campaign draft      a prepared, not-yet-launched campaign
+  ├── Campaign            a launched outreach effort
+  ├── Email               an individual message, outbound or inbound
+  ├── Interaction         a classified reply outcome
+  └── Wire release        a press release for distribution
+
+Journalist ─────────── a media contact. Shared, read-only.
+Publication ────────── an outlet
+Podcast ────────────── a podcast outlet
+Article ────────────── a published story</code></pre></div>
+<p><strong>An account holds one brand profile.</strong> Company name, website, positioning, messaging, themes, spokespeople and the PR plan are all attributes of the account. An API key belongs to exactly one account, and therefore to exactly one brand.</p>
+<p>If you manage several brands — your own products, or client brands as an agency — <strong>each brand needs its own account and its own API key.</strong> Design for this from the start: hold a key per brand and select the right one per request, rather than assuming one credential covers your whole portfolio. See §2.1.</p>
+<h3 id="1-2-how-the-pieces-fit-together">1.2 How the pieces fit together</h3>
+<p>The typical flow, and the order that matters:</p>
+<div class="codewrap"><pre class="code"><code>  company profile
+        │
+        ▼
+    analysis  ────────────▶  PR plan / campaign ideas
+        │
+        ▼
+  journalist discovery  ◀──── a pitch or an angle
+        │
+        ▼
+  pitch generation  ──▶  subject line  ──▶  personalisation
+        │
+        ▼
+  campaign draft  ──▶  human review  ──▶  launch
+        │
+        ▼
+     replies  ──▶  interactions  ──▶  your response</code></pre></div>
+<p>Two properties of this flow shape your integration:</p>
+<p><strong>The company profile drives everything downstream.</strong> Journalist relevance and pitch quality both derive from it. A sparse profile produces broad matches and generic copy — this shows up as weak reply rates rather than as errors. §6.2 covers what to populate.</p>
+<p><strong>Pitch generation and campaign creation are separate steps.</strong> No single call produces a finished campaign. You generate copy, review it, then pass it into a campaign. This is deliberate: it puts a human approval point in front of anything that sends email to a journalist.</p>
+<h3 id="1-3-glossary">1.3 Glossary</h3>
+<div class="tablewrap"><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>Account</strong></td><td>Your organisation and its brand profile. The tenant boundary.</td></tr><tr><td><strong>Company profile</strong></td><td>Brand attributes: name, URL, blurb, expertise, themes, topics, keywords, geographic focus.</td></tr><tr><td><strong>Analysis</strong></td><td>Brand analysis output: positioning, core messaging, PR messaging clusters, and a month-by-month PR plan.</td></tr><tr><td><strong>PR plan</strong></td><td>Suggested campaign ideas by month, from the analysis.</td></tr><tr><td><strong>Campaign idea</strong></td><td>One suggested campaign. Not yet a campaign.</td></tr><tr><td><strong>Campaign draft</strong></td><td>A prepared campaign. Nothing is sent until launch.</td></tr><tr><td><strong>Campaign</strong></td><td>A launched outreach effort targeting many journalists.</td></tr><tr><td><strong>Pitch</strong></td><td>The body copy of an outreach email.</td></tr><tr><td><strong>Personalisation line</strong></td><td>A per-journalist opening line prepended to the shared pitch.</td></tr><tr><td><strong>Journalist</strong></td><td>A media contact. Shared across customers, read-only.</td></tr><tr><td><strong>Interaction</strong></td><td>A classified reply outcome — positive, interview scheduled, unsubscribed, and so on.</td></tr><tr><td><strong>Sender</strong></td><td>A connected mailbox that outbound email is sent from.</td></tr><tr><td><strong>Spokesperson</strong></td><td>A named person at your brand available for quotes and interviews.</td></tr><tr><td><strong>Wire release</strong></td><td>A press release submitted for wire distribution.</td></tr></tbody></table></div>
+<h3 id="1-4-what-the-api-does-not-do">1.4 What the API does not do</h3>
+<p>Stated up front so you do not design against absent capability.</p>
+<ul>
+<li><strong>No account or brand creation.</strong> Accounts are provisioned by us. See §2.1.</li>
+<li><strong>No journalist email addresses.</strong> You target journalists by ID and we deliver. See §10.2.</li>
+<li><strong>No relevance scores or ranking explanations.</strong> Results are ordered; the ordering is not quantified. See §9.6.</li>
+<li><strong>No journalist record editing.</strong> The dataset is shared across all customers.</li>
+<li><strong>No single-call campaign generation.</strong> Copy generation and campaign creation are separate. See §1.2.</li>
+</ul>
+<hr>
+<h2 id="2-getting-started"><span class="secnum">2</span>Getting started</h2>
+<h3 id="2-1-getting-an-account-and-an-api-key">2.1 Getting an account and an API key</h3>
+<p>Accounts are provisioned by us as part of commercial onboarding, one per brand. You receive an API key for each through a secure channel.</p>
+<p>There is no public signup endpoint. Account creation involves contract acceptance and billing enrolment, so it is handled by your account manager rather than by an API call.</p>
+<p><strong>If you need many brands</strong>, tell us the expected number and growth rate during onboarding so we can provision in bulk rather than one at a time. See §12 for planned self-serve provisioning.</p>
+<h3 id="2-2-your-first-call">2.2 Your first call</h3>
+<p>Confirm the key works and see which account it maps to:</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/me</span>
+<span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"account_id"</span>: <span class="n">4821</span>,
+    <span class="k">"account_name"</span>: <span class="s">"Northwind Robotics"</span>
+  }
+}</code></pre></div>
+<p><strong>This establishes the most important rule in the API: the account is determined by your API key, never by the request body.</strong> You never send an account identifier. Cache <code>account_id</code> for your own logging and correlation, and never accept one as input from your end users.</p>
+<h3 id="2-3-your-first-real-call">2.3 Your first real call</h3>
+<p>Fetch journalists relevant to your brand:</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/top</span>
+<span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
+<p>If this returns few results or loose matches, the company profile needs enriching before anything else — start at §6.2.</p>
+<h3 id="2-4-integration-checklist">2.4 Integration checklist</h3>
+<p>Work through these in order. Each is explained in the section referenced.</p>
+<div class="tablewrap"><table><thead><tr><th></th><th>Step</th><th>Section</th></tr></thead><tbody><tr><td>1</td><td>Confirm your key with <code>GET /me</code></td><td>§2.2</td></tr><tr><td>2</td><td>Populate the company profile, including at least one spokesperson</td><td>§6.2</td></tr><tr><td>3</td><td>Connect a sending mailbox</td><td>§8</td></tr><tr><td>4</td><td>Verify journalist discovery returns sensible results</td><td>§6.4</td></tr><tr><td>5</td><td>Build the generate → review → launch flow, keeping <code>email_action</code> at <code>draft</code></td><td>§6.6</td></tr><tr><td>6</td><td>Add reply handling</td><td>§6.8, §11.3</td></tr><tr><td>7</td><td>Handle <code>is_contactable</code>, sender health, and rate limits</td><td>§4.8, §6.4, §8.4</td></tr><tr><td>8</td><td>Only then enable <code>email_action: "send"</code></td><td>§6.6</td></tr></tbody></table></div>
+<p>Step 8 is deliberately last. Until that switch is flipped, no call in your integration can send email to a real journalist — which makes everything before it safe to test freely.</p>
+<hr>
+<h2 id="3-authentication-and-scopes"><span class="secnum">3</span>Authentication and scopes</h2>
+<h3 id="3-1-scheme">3.1 Scheme</h3>
+<p>Bearer token over HTTPS on every request.</p>
+<div class="codewrap"><pre class="code"><code>Authorization: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f</code></pre></div>
+<p>Tokens are opaque strings — do not parse them. Treat a token as a full-account credential: store it in a secret manager, never in source control, never in client-side code, and never in a URL query string.</p>
+<p>If a token is exposed, contact us immediately for rotation (§13). Self-serve rotation is on the roadmap (§12).</p>
+<h3 id="3-2-one-key-one-account">3.2 One key, one account</h3>
+<p>Each key is bound to a single account. There is no cross-account access and no way to widen a key's reach.</p>
+<p>For a multi-brand integration, hold one key per brand and resolve the right key before each request. Confirm a key's account with <code>GET /me</code> when you first store it, and record the mapping on your side.</p>
+<h3 id="3-3-scopes">3.3 Scopes</h3>
+<p>Keys carry scopes limiting what they can do. Scopes take the form <code>read:&lt;resource&gt;</code> or <code>write:&lt;resource&gt;</code>, with <code>read:all</code> and <code>write:all</code> as wildcards.</p>
+<div class="tablewrap"><table><thead><tr><th>Resource</th><th><code>read:</code></th><th><code>write:</code></th></tr></thead><tbody><tr><td><code>account</code></td><td>Company profile, spokespeople, competitors, analysis</td><td>Update profile, spokespeople, competitors</td></tr><tr><td><code>journalists</code></td><td>Search, retrieve, top and relevant journalists</td><td>—</td></tr><tr><td><code>publications</code></td><td>Publications and podcasts</td><td>—</td></tr><tr><td><code>articles</code></td><td>Story search, trending, relevant</td><td>—</td></tr><tr><td><code>campaigns</code></td><td>Campaigns, drafts, campaign ideas</td><td>Create drafts, launch, pause, delete</td></tr><tr><td><code>pitches</code></td><td>—</td><td>Generate pitch, subject line, follow-up, personalisation</td></tr><tr><td><code>emails</code></td><td>Sent, drafted, scheduled email and replies</td><td>Send, reply</td></tr><tr><td><code>interactions</code></td><td>Reply history</td><td>—</td></tr><tr><td><code>lists</code></td><td>Retrieve and search lists</td><td>Save lists</td></tr><tr><td><code>wire</code></td><td>Retrieve releases</td><td>Submit releases</td></tr><tr><td><code>senders</code></td><td>Mailbox status</td><td>Connect, disconnect</td></tr></tbody></table></div>
+<p><strong>Request the narrowest set that does the job.</strong> <code>write:emails</code> and <code>write:campaigns</code> are the two that cause real email to be sent — a service that only reads analytics should never hold them. If your architecture separates campaign preparation from dispatch, use separate keys with separate scopes so a bug in the preparation path cannot send.</p>
+<p>A call missing a required scope returns <code>403</code> naming the scope needed. It does not return <code>404</code>.</p>
+<h3 id="3-4-key-states">3.4 Key states</h3>
+<div class="tablewrap"><table><thead><tr><th>State</th><th>Effect</th></tr></thead><tbody><tr><td><code>ACTIVE</code></td><td>Works normally.</td></tr><tr><td><code>PAUSED</code></td><td>All requests rejected with <code>403</code>. Reversible.</td></tr><tr><td><code>ARCHIVED</code></td><td>All requests rejected with <code>403</code>. Permanent.</td></tr></tbody></table></div>
+<hr>
+<h2 id="4-conventions"><span class="secnum">4</span>Conventions</h2>
+<h3 id="4-1-base-url-and-versioning">4.1 Base URL and versioning</h3>
+<div class="codewrap"><pre class="code"><code>https://{host}/api/v1</code></pre></div>
+<p><code>{host}</code> is your assigned environment hostname, supplied with your key. The major version is in the path.</p>
+<p><strong>What may change without notice inside <code>v1</code></strong> — your client must tolerate all of these:</p>
+<ul>
+<li>New fields in responses</li>
+<li>New values in enums</li>
+<li>New endpoints</li>
+<li>New optional request fields</li>
+</ul>
+<p><strong>What will not change inside <code>v1</code>:</strong></p>
+<ul>
+<li>Removing or renaming a field</li>
+<li>Changing a field's type or nullability</li>
+<li>Removing an enum value</li>
+<li>Changing the meaning of an existing parameter</li>
+<li>Changing an error <code>code</code> for an existing condition</li>
+</ul>
+<p>Breaking changes ship as <code>v2</code>, announced at least 90 days ahead, with both versions live for at least 12 months.</p>
+<p><strong>Two client requirements follow from this.</strong> Parse JSON leniently and ignore unknown fields — if your HTTP client or code generator errors on unrecognised properties, disable that before going live. And give every enum branch a <code>default</code> case.</p>
+<h3 id="4-2-field-naming">4.2 Field naming</h3>
+<p><code>snake_case</code> in all request and response bodies. Headers use standard <code>Kebab-Case</code>.</p>
+<h3 id="4-3-identifiers">4.3 Identifiers</h3>
+<p>Identifiers are integers, unique within their type.</p>
+<div class="tablewrap"><table><thead><tr><th>Identifier</th><th>Scope</th></tr></thead><tbody><tr><td><code>account_id</code></td><td>Derived from your key. You never send it.</td></tr><tr><td><code>journalist_id</code>, <code>publication_id</code>, <code>podcast_id</code>, <code>article_id</code></td><td>Global</td></tr><tr><td><code>campaign_id</code>, <code>draft_id</code>, <code>email_id</code>, <code>interaction_id</code>, <code>release_id</code>, <code>sender_id</code></td><td>Your account</td></tr></tbody></table></div>
+<p>Account-scoped identifiers are only resolvable with a key for that account. An identifier from another account returns <code>404</code>.</p>
+<p>Wire releases additionally carry a <code>guid</code> UUID, used for de-duplication by downstream distribution.</p>
+<h3 id="4-4-timestamps">4.4 Timestamps</h3>
+<p>ISO 8601 UTC with a <code>Z</code> suffix: <code>2026-08-18T09:15:47Z</code>. Fields ending <code>_at</code> are timestamps; fields ending <code>_date</code> are calendar dates (<code>2026-08-18</code>) where time of day carries no meaning.</p>
+<p><strong>One deliberate exception.</strong> Wire release scheduling takes a wall-clock <code>date</code>, <code>time</code> and IANA <code>timezone</code> separately, because a press release goes out at 9am <em>in a named city</em>, not at a UTC instant. See §6.9.</p>
+<h3 id="4-5-pagination">4.5 Pagination</h3>
+<p>List endpoints are page-based.</p>
+<div class="tablewrap"><table><thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Maximum</th></tr></thead><tbody><tr><td><code>page</code></td><td>integer</td><td>1</td><td>—</td></tr><tr><td><code>page_size</code></td><td>integer</td><td>10–50 by endpoint</td><td>100</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"journalists"</span>: [],
+    <span class="k">"total"</span>: <span class="n">247</span>,
+    <span class="k">"page"</span>: <span class="n">1</span>,
+    <span class="k">"page_size"</span>: <span class="n">25</span>
+  }
+}</code></pre></div>
+<p><code>total</code> is a real count, so page count is <code>ceil(total / page_size)</code>.</p>
+<p><strong>When paginating a set that changes underneath you</strong> — new stories arriving, new replies landing — page boundaries can shift, so a row may repeat or be skipped. For a stable pass over data, filter by an explicit date range rather than relying on page numbers alone, and de-duplicate on ID as you collect.</p>
+<h3 id="4-6-response-envelope">4.6 Response envelope</h3>
+<p>Success is always an object with a <code>data</code> key:</p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"campaign_id"</span>: <span class="n">33914</span> } }</code></pre></div>
+<p>Never a bare array or scalar, so top-level fields can be added without breaking your parser.</p>
+<p>Conventions that hold across every endpoint:</p>
+<ul>
+<li><strong>Stable keys.</strong> A given endpoint returns the same keys every time.</li>
+<li><strong><code>null</code> versus <code>[]</code>.</strong> Absent single values are <code>null</code>; empty collections are <code>[]</code>, never <code>null</code>.</li>
+<li><strong>No polymorphism.</strong> A field never changes type by context.</li>
+<li><strong>Opt-in expansion.</strong> Lists return lean objects; related data is requested explicitly with flags like <code>include_articles</code>. Expansions cost latency — request them only when you will render them.</li>
+<li><strong>Display copy is marked.</strong> Fields marked <strong>Display copy</strong> are human-readable and safe to render. Everything else is for logic.</li>
+</ul>
+<h3 id="4-7-errors">4.7 Errors</h3>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"error"</span>: <span class="s">"Validation error"</span>,
+  <span class="k">"code"</span>: <span class="s">"validation_error"</span>,
+  <span class="k">"request_id"</span>: <span class="s">"req_2b8f4e91a7c03d56"</span>,
+  <span class="k">"details"</span>: [
+    { <span class="k">"path"</span>: <span class="s">"journalists"</span>, <span class="k">"message"</span>: <span class="s">"Array must contain at least 1 element(s)"</span> }
+  ]
+}</code></pre></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Notes</th></tr></thead><tbody><tr><td><code>error</code></td><td>Human-readable. For logs and diagnostics. <strong>Do not branch on this text</strong> — wording may change at any time.</td></tr><tr><td><code>code</code></td><td>Stable and machine-readable. <strong>Branch on this.</strong></td></tr><tr><td><code>request_id</code></td><td>Present on every response. <strong>Quote it in any support request.</strong></td></tr><tr><td><code>details</code></td><td>Field-level errors on validation failures. <code>path</code> is the dotted field path.</td></tr></tbody></table></div>
+<p><strong>Error codes</strong></p>
+<div class="tablewrap"><table><thead><tr><th>HTTP</th><th><code>code</code></th><th>Retry</th><th>Meaning</th></tr></thead><tbody><tr><td>400</td><td><code>validation_error</code></td><td>No</td><td>Schema violation; see <code>details</code></td></tr><tr><td>400</td><td><code>invalid_request</code></td><td>No</td><td>Well-formed but not actionable</td></tr><tr><td>401</td><td><code>missing_credentials</code></td><td>No</td><td>No <code>Authorization</code> header</td></tr><tr><td>401</td><td><code>invalid_token</code></td><td>No</td><td>Token not recognised</td></tr><tr><td>403</td><td><code>key_inactive</code></td><td>No</td><td>Key is paused or archived</td></tr><tr><td>403</td><td><code>insufficient_scope</code></td><td>No</td><td>Key lacks the required scope</td></tr><tr><td>404</td><td><code>not_found</code></td><td>No</td><td>No such object in your account</td></tr><tr><td>405</td><td><code>method_not_allowed</code></td><td>No</td><td>See the <code>Allow</code> header</td></tr><tr><td>409</td><td><code>invalid_state_transition</code></td><td>No</td><td>For example, pausing a deleted campaign</td></tr><tr><td>422</td><td><code>no_valid_sender</code></td><td>No</td><td>No connected mailbox — see §8</td></tr><tr><td>422</td><td><code>no_contactable_recipients</code></td><td>No</td><td>No target has a usable contact route</td></tr><tr><td>429</td><td><code>rate_limited</code></td><td><strong>Yes</strong></td><td>See §4.8</td></tr><tr><td>500</td><td><code>internal_error</code></td><td><strong>Yes</strong></td><td>Report with <code>request_id</code></td></tr><tr><td>503</td><td><code>service_unavailable</code></td><td><strong>Yes</strong></td><td>Temporary. Honour <code>Retry-After</code>.</td></tr></tbody></table></div>
+<p>Retry only <code>429</code>, <code>500</code> and <code>503</code>. Retrying a <code>4xx</code> will fail identically.</p>
+<h3 id="4-8-rate-limits">4.8 Rate limits</h3>
+<p><strong>100 requests per minute per API key.</strong></p>
+<div class="codewrap"><pre class="code"><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 73</code></pre></div>
+<p>On exceeding:</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">HTTP/1.1 429 Too Many Requests</span>
+<span class="k">Retry-After</span>: 27</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"error"</span>: <span class="s">"Rate limit exceeded. Try again later."</span>, <span class="k">"code"</span>: <span class="s">"rate_limited"</span>, <span class="k">"request_id"</span>: <span class="s">"req_6d1a93f7c4e08b25"</span> }</code></pre></div>
+<p><strong>Required client behaviour:</strong> honour <code>Retry-After</code>, then exponential backoff with jitter — <code>sleep = random(0, min(60, 2^attempt))</code> seconds. Never retry in a tight loop.</p>
+<p><strong>Budget for generation, not for reads.</strong> Read endpoints are cheap and 100/minute is generous. The generation endpoints in §6.5 take seconds each, so in practice concurrency and latency constrain you well before the request limit does. Queue generation work on your side rather than firing it in parallel bursts.</p>
+<h3 id="4-9-request-size">4.9 Request size</h3>
+<div class="tablewrap"><table><thead><tr><th>Limit</th><th>Value</th></tr></thead><tbody><tr><td>Standard request body</td><td>1 MB</td></tr><tr><td>Campaign and wire endpoints</td><td>25 MB</td></tr><tr><td>Journalist IDs per lookup</td><td>100</td></tr><tr><td>Journalists per personalisation call</td><td>50</td></tr></tbody></table></div>
+<p>Attachments are base64-encoded inline in the request body, which is why campaign and wire endpoints allow 25 MB. Base64 adds roughly 33% overhead, so a 25 MB body carries about 18 MB of file.</p>
+<h3 id="4-10-required-headers">4.10 Required headers</h3>
+<div class="tablewrap"><table><thead><tr><th>Header</th><th>Required</th><th>Notes</th></tr></thead><tbody><tr><td><code>Authorization</code></td><td>Always</td><td><code>Bearer &lt;token&gt;</code></td></tr><tr><td><code>Content-Type</code></td><td>On writes</td><td><code>application/json</code></td></tr><tr><td><code>User-Agent</code></td><td>Always</td><td>Identify your integration, e.g. <code>NorthwindPR/2.1</code>. Helps us help you.</td></tr></tbody></table></div>
+<hr>
+<h2 id="5-timing-and-long-running-work"><span class="secnum">5</span>Timing and long-running work</h2>
+<h3 id="5-1-what-to-expect">5.1 What to expect</h3>
+<p>Every endpoint in §6 is synchronous — you make a request and get a result. Most are fast. <strong>The generation endpoints are slow enough that they shape your UI design</strong>, so plan for them explicitly.</p>
+<div class="tablewrap"><table><thead><tr><th>Endpoint</th><th>Typical</th><th>Slow case</th></tr></thead><tbody><tr><td><code>GET /me</code></td><td>40 ms</td><td>120 ms</td></tr><tr><td><code>POST /journalists/search</code></td><td>300 ms</td><td>1.2 s</td></tr><tr><td><code>POST /journalists/top</code></td><td>800 ms</td><td>2.5 s</td></tr><tr><td><code>POST /journalists/relevant</code></td><td>1.5 s</td><td>4 s</td></tr><tr><td><code>POST /articles/search</code></td><td>250 ms</td><td>900 ms</td></tr><tr><td><code>POST /stories/trending</code></td><td>400 ms</td><td>1.5 s</td></tr><tr><td><code>POST /pitches/generate</code></td><td><strong>12 s</strong></td><td><strong>30 s</strong></td></tr><tr><td><code>POST /pitches/subject-line</code></td><td><strong>4 s</strong></td><td><strong>9 s</strong></td></tr><tr><td><code>POST /pitches/follow-up</code></td><td><strong>6 s</strong></td><td><strong>14 s</strong></td></tr><tr><td><code>POST /pitches/personalize</code></td><td><strong>15 s</strong></td><td><strong>45 s</strong></td></tr><tr><td><code>POST /outreach/generate</code></td><td><strong>10 s</strong></td><td><strong>25 s</strong></td></tr><tr><td><code>POST /campaigns/drafts</code></td><td>1.5 s</td><td>5 s</td></tr><tr><td><code>POST /campaigns</code></td><td>3 s</td><td>12 s</td></tr><tr><td><code>GET /campaigns</code></td><td>200 ms</td><td>700 ms</td></tr><tr><td><code>POST /wire-releases</code></td><td>400 ms</td><td>1.5 s</td></tr></tbody></table></div>
+<p>These are indicative figures for planning, not a service level. Treat the slow-case column as what your timeouts must tolerate.</p>
+<h3 id="5-2-client-requirements">5.2 Client requirements</h3>
+<p><strong>Set your HTTP timeout to at least 90 seconds</strong> on the generation endpoints. A 30-second default will fail intermittently on <code>/pitches/personalize</code>.</p>
+<p><strong>Keep personalisation batches to 10–20 journalists.</strong> The endpoint accepts 50, but a full batch approaches 45 seconds — close to common proxy and gateway timeouts. Smaller batches are more reliable and let you show incremental progress.</p>
+<p><strong>Never call a generation endpoint in a user-blocking request path.</strong> Queue the work, return immediately, and update your UI when it completes. A user staring at a spinner for 30 seconds will assume it has broken.</p>
+<p><strong>Generate in the background, review in the foreground.</strong> The natural shape is: user requests a campaign → you queue generation → you notify them when copy is ready for review. That keeps the slowest work off the interactive path and puts the human approval step exactly where it belongs.</p>
+<h3 id="5-3-brand-analysis-timing">5.3 Brand analysis timing</h3>
+<p>Brand analysis is more substantial than a single generation call and takes <strong>30 to 60 seconds</strong> end to end.</p>
+<p>Analysis is currently initiated from the platform interface, and results are then available through <code>GET /account/analysis</code> (§6.3). <strong>API-initiated analysis with a pollable job resource is on the roadmap</strong> — see §12. Until it ships, plan for analysis being triggered outside your product, and read the results through the API.</p>
+<p>Journalist discovery and pitch generation do not require a completed analysis. They work from the company profile alone, with somewhat less precision.</p>
+<hr>
+<h2 id="6-endpoint-reference"><span class="secnum">6</span>Endpoint reference</h2>
+<h3 id="6-1-sending-data-to-us">6.1 Sending data to us</h3>
+<p>There are two ingest paths, with different shapes.</p>
+<p><strong>The company profile</strong> is durable brand data — read and updated over the life of the account, and the input to analysis, discovery and pitch generation. Covered in §6.2.</p>
+<p><strong>A wire release</strong> is a single time-bound announcement submitted for distribution. Covered in §6.9.</p>
+<p>Free text, URLs and files are handled differently:</p>
+<div class="tablewrap"><table><thead><tr><th>Input</th><th>How</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Free text</strong></td><td>Inline in the request body</td><td>Used directly. Fastest path.</td></tr><tr><td><strong>URLs</strong></td><td>Inline as a field value</td><td>Fetched server-side. Must be publicly reachable — no authentication, no cookies.</td></tr><tr><td><strong>Files</strong></td><td>Base64-encoded inline</td><td>Campaign attachments and wire release images. Counts toward the 25 MB limit.</td></tr></tbody></table></div>
+<hr>
+<h3 id="6-2-company-profile">6.2 Company profile</h3>
+<p>The profile drives journalist relevance and pitch quality. It is the highest-leverage data in your integration.</p>
+<h4 id="get-api-v1-account-profile" class="endpoint"><span class="method m-get">GET</span><code class="path">/api/v1/account/profile</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:account</code></td></tr><tr><td><strong>Typical latency</strong></td><td>80 ms</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"account_id"</span>: <span class="n">4821</span>,
+    <span class="k">"name"</span>: <span class="s">"Northwind Robotics"</span>,
+    <span class="k">"primary_url"</span>: <span class="s">"https://northwindrobotics.com"</span>,
+    <span class="k">"about_url"</span>: <span class="s">"https://northwindrobotics.com/about"</span>,
+    <span class="k">"company_blurb"</span>: <span class="s">"Northwind Robotics builds autonomous mobile robots for mid-market distribution centres, with a product line rated for refrigerated environments."</span>,
+    <span class="k">"sector"</span>: <span class="s">"Logistics Technology"</span>,
+    <span class="k">"business_model"</span>: [<span class="s">"B2B"</span>],
+    <span class="k">"number_employees"</span>: <span class="s">"50-200"</span>,
+    <span class="k">"areas_of_expertise"</span>: [
+      <span class="s">"Warehouse automation"</span>,
+      <span class="s">"Cold-chain logistics"</span>,
+      <span class="s">"Autonomous mobile robots"</span>
+    ],
+    <span class="k">"themes"</span>: [<span class="s">"Supply chain"</span>, <span class="s">"Robotics"</span>, <span class="s">"Labour economics"</span>],
+    <span class="k">"topics"</span>: [<span class="s">"warehouse automation"</span>, <span class="s">"cold chain"</span>, <span class="s">"fulfilment"</span>],
+    <span class="k">"keywords"</span>: [<span class="s">"autonomous mobile robots"</span>, <span class="s">"refrigerated warehouse"</span>, <span class="s">"3PL automation"</span>],
+    <span class="k">"locations"</span>: [<span class="s">"Portland, Oregon"</span>, <span class="s">"United States"</span>],
+    <span class="k">"geo_focus"</span>: [<span class="s">"NATIONAL"</span>, <span class="s">"REGIONAL"</span>],
+    <span class="k">"existing_pr"</span>: <span class="s">"In-house, one FTE"</span>,
+    <span class="k">"notes"</span>: <span class="s">"Series B announced August 2026"</span>,
+    <span class="k">"spokespeople"</span>: [
+      {
+        <span class="k">"spokesperson_id"</span>: <span class="n">771</span>,
+        <span class="k">"name"</span>: <span class="s">"Dana Reyes"</span>,
+        <span class="k">"title"</span>: <span class="s">"Chief Executive Officer"</span>,
+        <span class="k">"linkedin_url"</span>: <span class="s">"https://www.linkedin.com/in/dana-reyes-northwind"</span>,
+        <span class="k">"is_primary"</span>: <span class="b">true</span>
+      },
+      {
+        <span class="k">"spokesperson_id"</span>: <span class="n">772</span>,
+        <span class="k">"name"</span>: <span class="s">"Marcus Ellery"</span>,
+        <span class="k">"title"</span>: <span class="s">"VP of Engineering"</span>,
+        <span class="k">"linkedin_url"</span>: <span class="b">null</span>,
+        <span class="k">"is_primary"</span>: <span class="b">false</span>
+      }
+    ],
+    <span class="k">"competitors"</span>: [
+      { <span class="k">"competitor_id"</span>: <span class="n">331</span>, <span class="k">"name"</span>: <span class="s">"Locus Robotics"</span> },
+      { <span class="k">"competitor_id"</span>: <span class="n">332</span>, <span class="k">"name"</span>: <span class="s">"6 River Systems"</span> }
+    ],
+    <span class="k">"updated_at"</span>: <span class="s">"2026-08-18T09:15:03Z"</span>
+  }
+}</code></pre></div>
+<p><code>geo_focus</code>: <code>MULTINATIONAL</code>, <code>GLOBAL</code>, <code>NATIONAL</code>, <code>REGIONAL</code>, <code>LOCAL</code>, <code>NONE</code>. <code>business_model</code>: <code>B2B</code>, <code>B2C</code>, <code>B2B2C</code>.</p>
+<h4 id="patch-api-v1-account-profile" class="endpoint"><span class="method m-patch">PATCH</span><code class="path">/api/v1/account/profile</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:account</code></td></tr><tr><td><strong>Typical latency</strong></td><td>150 ms</td></tr></tbody></table></div>
+<p>Partial update — send only the fields that change. Omitted fields are untouched; pass <code>null</code> to clear an optional field.</p>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Constraints</th></tr></thead><tbody><tr><td><code>name</code></td><td>string</td><td>1–200 chars</td></tr><tr><td><code>primary_url</code></td><td>string</td><td>Absolute URL, publicly reachable</td></tr><tr><td><code>about_url</code></td><td>string, nullable</td><td>Absolute URL</td></tr><tr><td><code>company_blurb</code></td><td>string, nullable</td><td>Max 5000 chars</td></tr><tr><td><code>sector</code></td><td>string, nullable</td><td>Max 120 chars</td></tr><tr><td><code>business_model</code></td><td>array of enum</td><td></td></tr><tr><td><code>number_employees</code></td><td>string, nullable</td><td></td></tr><tr><td><code>areas_of_expertise</code></td><td>array of string</td><td>Max 30 items</td></tr><tr><td><code>themes</code></td><td>array of string</td><td>Max 30 items</td></tr><tr><td><code>topics</code></td><td>array of string</td><td>Max 50 items</td></tr><tr><td><code>keywords</code></td><td>array of string</td><td>Max 50 items</td></tr><tr><td><code>locations</code></td><td>array of string</td><td>Max 20 items</td></tr><tr><td><code>geo_focus</code></td><td>array of enum</td><td></td></tr><tr><td><code>existing_pr</code></td><td>string, nullable</td><td>Max 1000 chars</td></tr><tr><td><code>notes</code></td><td>string, nullable</td><td>Max 5000 chars</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">PATCH</span> <span class="u">/api/v1/account/profile</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"company_blurb"</span>: <span class="s">"Northwind Robotics builds autonomous mobile robots for mid-market distribution centres, including a cold-chain line rated to -20C."</span>,
+  <span class="k">"keywords"</span>: [<span class="s">"autonomous mobile robots"</span>, <span class="s">"refrigerated warehouse"</span>, <span class="s">"3PL automation"</span>, <span class="s">"cold chain robotics"</span>],
+  <span class="k">"notes"</span>: <span class="s">"Series B announced August 2026. Cold-chain line GA in Q4."</span>
+}</code></pre></div>
+<p>Returns the full updated profile.</p>
+<p><strong>Updating the profile does not re-run brand analysis.</strong> The stored analysis continues to reflect the profile as it was when the analysis ran. Compare <code>generated_at</code> on <code>GET /account/analysis</code> with <code>updated_at</code> here to detect drift, and surface the gap to your users so they can request a refresh.</p>
+<p><strong>Validation error, <code>400</code>:</strong></p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"error"</span>: <span class="s">"Validation error"</span>,
+  <span class="k">"code"</span>: <span class="s">"validation_error"</span>,
+  <span class="k">"request_id"</span>: <span class="s">"req_4a91c3e87d5b2f60"</span>,
+  <span class="k">"details"</span>: [
+    { <span class="k">"path"</span>: <span class="s">"primary_url"</span>, <span class="k">"message"</span>: <span class="s">"Invalid URL (http://sample.com)"</span> },
+    { <span class="k">"path"</span>: <span class="s">"keywords"</span>, <span class="k">"message"</span>: <span class="s">"Array must contain at most 50 element(s)"</span> }
+  ]
+}</code></pre></div>
+<p>Every violated field is reported in one response, so you can bind errors to form fields in a single pass.</p>
+<h4 id="how-much-profile-detail-actually-matters">How much profile detail actually matters</h4>
+<p>There is no error for a thin profile — the cost appears in output quality:</p>
+<div class="tablewrap"><table><thead><tr><th>Profile state</th><th>Effect downstream</th></tr></thead><tbody><tr><td>Name and website only</td><td>Broad journalist matches; generic pitch copy</td></tr><tr><td>Plus <code>company_blurb</code> and <code>areas_of_expertise</code></td><td>Noticeably tighter relevance; copy reflects real positioning</td></tr><tr><td>Plus <code>themes</code>, <code>topics</code>, <code>keywords</code></td><td>Better matching, especially in niche verticals</td></tr><tr><td>Plus <strong>at least one spokesperson</strong></td><td>Pitches can offer an interview and attribute quotes</td></tr><tr><td>Plus <code>competitors</code></td><td>Enables competitor-mention story angles</td></tr></tbody></table></div>
+<p><strong>The spokesperson is the single largest lever.</strong> A pitch that offers a named interview subject gives a journalist a reason to reply; one that does not is an announcement they can ignore. If you collect only one optional thing from your users, collect this.</p>
+<h4 id="spokespeople-and-competitors">Spokespeople and competitors</h4>
+<div class="tablewrap"><table><thead><tr><th>Method</th><th>Path</th><th>Scope</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/api/v1/account/spokespeople</code></td><td><code>read:account</code></td></tr><tr><td><code>POST</code></td><td><code>/api/v1/account/spokespeople</code></td><td><code>write:account</code></td></tr><tr><td><code>PATCH</code></td><td><code>/api/v1/account/spokespeople/{spokesperson_id}</code></td><td><code>write:account</code></td></tr><tr><td><code>DELETE</code></td><td><code>/api/v1/account/spokespeople/{spokesperson_id}</code></td><td><code>write:account</code></td></tr><tr><td><code>GET</code></td><td><code>/api/v1/account/competitors</code></td><td><code>read:account</code></td></tr><tr><td><code>PUT</code></td><td><code>/api/v1/account/competitors</code></td><td><code>write:account</code></td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/account/spokespeople</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"name"</span>: <span class="s">"Priya Raghunathan"</span>,
+  <span class="k">"title"</span>: <span class="s">"Head of Communications"</span>,
+  <span class="k">"linkedin_url"</span>: <span class="s">"https://www.linkedin.com/in/priya-raghunathan-comms"</span>,
+  <span class="k">"is_primary"</span>: <span class="b">false</span>
+}</code></pre></div>
+<p>Competitors use <code>PUT</code> with the complete list — the call replaces the whole set rather than merging:</p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"competitors"</span>: [<span class="s">"Locus Robotics"</span>, <span class="s">"6 River Systems"</span>, <span class="s">"Fetch Robotics"</span>] }</code></pre></div>
+<hr>
+<h3 id="6-3-brand-analysis">6.3 Brand analysis</h3>
+<h4 id="get-api-v1-account-analysis" class="endpoint"><span class="method m-get">GET</span><code class="path">/api/v1/account/analysis</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:account</code></td></tr><tr><td><strong>Typical latency</strong></td><td>90 ms</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"account_id"</span>: <span class="n">4821</span>,
+    <span class="k">"status"</span>: <span class="s">"COMPLETE"</span>,
+    <span class="k">"status_label"</span>: <span class="s">"Complete"</span>,
+    <span class="k">"is_accepted"</span>: <span class="b">true</span>,
+    <span class="k">"generated_at"</span>: <span class="s">"2026-08-18T09:15:47Z"</span>,
+    <span class="k">"company_analysis"</span>: {
+      <span class="k">"company_description"</span>: <span class="s">"Northwind Robotics develops autonomous mobile robots and fleet coordination software for mid-market distribution centres, with a differentiated product line for refrigerated environments."</span>,
+      <span class="k">"mission"</span>: <span class="s">"Make warehouse automation viable for operators who cannot rebuild their facilities."</span>,
+      <span class="k">"vision"</span>: <span class="s">"Every distribution centre runs a mixed human-robot workforce by 2035."</span>,
+      <span class="k">"positioning"</span>: <span class="s">"The mid-market alternative to enterprise warehouse robotics, deployable without facility retrofitting."</span>,
+      <span class="k">"value_proposition"</span>: <span class="s">"Automation without the retrofit — including in cold storage, where conventional robots fail."</span>,
+      <span class="k">"pricing_model"</span>: <span class="s">"Robots-as-a-service, per-unit monthly subscription with a coordination software licence."</span>,
+      <span class="k">"competitor_names"</span>: [<span class="s">"Locus Robotics"</span>, <span class="s">"6 River Systems"</span>, <span class="s">"Fetch Robotics"</span>],
+      <span class="k">"products_services"</span>: [
+        <span class="s">"NW-200 autonomous mobile robot"</span>,
+        <span class="s">"NW-200C cold-chain variant"</span>,
+        <span class="s">"Northwind Fleet coordination software"</span>
+      ],
+      <span class="k">"key_features"</span>: [
+        <span class="s">"No floor modification or facility retrofit required"</span>,
+        <span class="s">"Continuous operation to -20C"</span>,
+        <span class="s">"Fleet coordination bundled rather than licensed separately"</span>
+      ],
+      <span class="k">"values"</span>: [<span class="s">"Operator-first"</span>, <span class="s">"Pragmatic engineering"</span>, <span class="s">"Transparent pricing"</span>],
+      <span class="k">"technology"</span>: [<span class="s">"Autonomous navigation"</span>, <span class="s">"Computer vision"</span>, <span class="s">"Fleet orchestration"</span>],
+      <span class="k">"regions_locations"</span>: [<span class="s">"United States"</span>, <span class="s">"Canada"</span>, <span class="s">"Pacific Northwest"</span>],
+      <span class="k">"target_markets"</span>: [
+        <span class="s">"Third-party logistics providers"</span>,
+        <span class="s">"Regional grocery distributors"</span>,
+        <span class="s">"E-commerce fulfilment operators"</span>
+      ],
+      <span class="k">"verticals_client_intersect"</span>: [<span class="s">"Food and beverage distribution"</span>, <span class="s">"Retail fulfilment"</span>, <span class="s">"Cold chain"</span>]
+    },
+    <span class="k">"core_messaging"</span>: {
+      <span class="k">"tone"</span>: [<span class="s">"Pragmatic"</span>, <span class="s">"Technical"</span>, <span class="s">"Operator-focused"</span>],
+      <span class="k">"perspective"</span>: <span class="s">"The voice of an operator who has run a warehouse, not a robotics vendor."</span>,
+      <span class="k">"core_messages"</span>: [
+        <span class="s">"Warehouse automation should not require rebuilding the warehouse."</span>,
+        <span class="s">"Cold storage has the worst labour shortage in logistics and the least automation."</span>,
+        <span class="s">"Mid-market operators have been priced out of automation by enterprise contracts."</span>
+      ]
+    },
+    <span class="k">"pr_messaging"</span>: [
+      {
+        <span class="k">"cluster_name"</span>: <span class="s">"Labour economics"</span>,
+        <span class="k">"messages"</span>: [
+          <span class="s">"Warehouse labour shortfall is structural, not cyclical."</span>,
+          <span class="s">"Refrigerated facilities face the sharpest staffing gap in the sector."</span>
+        ]
+      },
+      {
+        <span class="k">"cluster_name"</span>: <span class="s">"Technical differentiation"</span>,
+        <span class="k">"messages"</span>: [
+          <span class="s">"Conventional warehouse robots fail below freezing on battery, sensors, and materials."</span>,
+          <span class="s">"Retrofit-free deployment is what makes mid-market economics work."</span>
+        ]
+      }
+    ],
+    <span class="k">"pr_plan"</span>: [
+      {
+        <span class="k">"month"</span>: <span class="s">"September 2026"</span>,
+        <span class="k">"campaigns"</span>: [
+          {
+            <span class="k">"campaign_idea_id"</span>: <span class="s">"2026-09-0"</span>,
+            <span class="k">"campaign_idea"</span>: <span class="s">"Series B announcement framed around the cold-chain automation gap"</span>,
+            <span class="k">"pitch_type"</span>: <span class="s">"announcement"</span>,
+            <span class="k">"timing"</span>: <span class="s">"Early September"</span>,
+            <span class="k">"themes"</span>: [<span class="s">"Robotics"</span>, <span class="s">"Supply chain"</span>],
+            <span class="k">"topics"</span>: [<span class="s">"warehouse automation"</span>, <span class="s">"venture funding"</span>]
+          },
+          {
+            <span class="k">"campaign_idea_id"</span>: <span class="s">"2026-09-1"</span>,
+            <span class="k">"campaign_idea"</span>: <span class="s">"Dana Reyes commentary on structural warehouse labour shortfall"</span>,
+            <span class="k">"pitch_type"</span>: <span class="s">"expert_commentary"</span>,
+            <span class="k">"timing"</span>: <span class="s">"Mid September"</span>,
+            <span class="k">"themes"</span>: [<span class="s">"Labour economics"</span>],
+            <span class="k">"topics"</span>: [<span class="s">"warehouse staffing"</span>, <span class="s">"automation"</span>]
+          }
+        ]
+      },
+      {
+        <span class="k">"month"</span>: <span class="s">"October 2026"</span>,
+        <span class="k">"campaigns"</span>: [
+          {
+            <span class="k">"campaign_idea_id"</span>: <span class="s">"2026-10-0"</span>,
+            <span class="k">"campaign_idea"</span>: <span class="s">"Cold-chain deployment case study with a regional grocery distributor"</span>,
+            <span class="k">"pitch_type"</span>: <span class="s">"case_study"</span>,
+            <span class="k">"timing"</span>: <span class="s">"Early October"</span>,
+            <span class="k">"themes"</span>: [<span class="s">"Cold chain"</span>],
+            <span class="k">"topics"</span>: [<span class="s">"case study"</span>, <span class="s">"food distribution"</span>]
+          }
+        ]
+      }
+    ]
+  }
+}</code></pre></div>
+<p><strong>Field reference</strong></p>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Null?</th><th>Notes</th></tr></thead><tbody><tr><td><code>status</code></td><td>enum</td><td>No</td><td><code>NOT_STARTED</code>, <code>PARTIAL</code>, <code>COMPLETE</code></td></tr><tr><td><code>status_label</code></td><td>string</td><td>No</td><td><strong>Display copy</strong></td></tr><tr><td><code>is_accepted</code></td><td>boolean</td><td>No</td><td>Whether the analysis was reviewed and accepted</td></tr><tr><td><code>generated_at</code></td><td>timestamp</td><td>Yes</td><td><code>null</code> if never run. Compare with profile <code>updated_at</code>.</td></tr><tr><td><code>company_analysis</code></td><td>object</td><td>Yes</td><td><code>null</code> until that stage completes</td></tr><tr><td><code>core_messaging</code></td><td>object</td><td>Yes</td><td><code>null</code> until that stage completes</td></tr><tr><td><code>pr_messaging</code></td><td>array</td><td>No</td><td><code>[]</code> until that stage completes</td></tr><tr><td><code>pr_plan</code></td><td>array</td><td>No</td><td><code>[]</code> until that stage completes</td></tr><tr><td><code>pr_plan[].month</code></td><td>string</td><td>No</td><td><strong>Display copy.</strong> A month label, not a date.</td></tr></tbody></table></div>
+<p>All text fields under <code>company_analysis</code>, <code>core_messaging</code> and <code>pr_messaging</code> are <strong>Display copy</strong>.</p>
+<p><strong>Two things your integration must handle.</strong></p>
+<p><strong>Sections can be absent.</strong> <code>status: "PARTIAL"</code> means analysis is incomplete and some sections are <code>null</code> or empty. Guard every nested access rather than assuming a full object.</p>
+<p><strong><code>campaign_idea_id</code> is not a durable key.</strong> It identifies an idea within the current plan only; when analysis is re-run, the plan is regenerated and identifiers may refer to different ideas. Use it promptly to create a campaign, and do not store it as a long-lived reference. If you need permanent tracking of which suggested campaigns were acted on, record the resulting <code>campaign_id</code> instead.</p>
+<h4 id="get-api-v1-campaigns-ideas" class="endpoint"><span class="method m-get">GET</span><code class="path">/api/v1/campaigns/ideas</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:campaigns</code></td></tr><tr><td><strong>Typical latency</strong></td><td>100 ms</td></tr></tbody></table></div>
+<p>The same plan data, flattened and filterable — more convenient for a "suggested campaigns" list.</p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"campaign_ideas"</span>: [
+      {
+        <span class="k">"campaign_idea_id"</span>: <span class="s">"2026-09-0"</span>,
+        <span class="k">"campaign_idea"</span>: <span class="s">"Series B announcement framed around the cold-chain automation gap"</span>,
+        <span class="k">"pitch_type"</span>: <span class="s">"announcement"</span>,
+        <span class="k">"timing"</span>: <span class="s">"Early September"</span>,
+        <span class="k">"themes"</span>: [<span class="s">"Robotics"</span>, <span class="s">"Supply chain"</span>],
+        <span class="k">"topics"</span>: [<span class="s">"warehouse automation"</span>, <span class="s">"venture funding"</span>],
+        <span class="k">"status"</span>: <span class="s">"NOT_STARTED"</span>
+      }
+    ]
+  }
+}</code></pre></div>
+<p>Returns <code>404</code> if no analysis exists — check <code>status</code> on <code>GET /account/analysis</code> first.</p>
+<hr>
+<h3 id="6-4-journalist-discovery">6.4 Journalist discovery</h3>
+<h4 id="post-api-v1-journalists-top" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/journalists/top</code></h4>
+<p>Journalists most relevant to your brand profile.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:journalists</code></td></tr><tr><td><strong>Typical latency</strong></td><td>800 ms</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Default</th></tr></thead><tbody><tr><td><code>include_articles</code></td><td>boolean</td><td><code>false</code></td></tr><tr><td><code>include_interactions</code></td><td>boolean</td><td><code>false</code></td></tr></tbody></table></div>
+<h4 id="post-api-v1-journalists-relevant" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/journalists/relevant</code></h4>
+<p>Journalists relevant to a specific pitch or angle. <strong>Use this for campaign targeting</strong> — results are consistently tighter than brand-level matching because the angle is more specific.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:journalists</code></td></tr><tr><td><strong>Typical latency</strong></td><td>1.5 s</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>pitch</code></td><td>string</td><td><strong>Yes</strong></td><td>Min 10 chars. The pitch body or angle.</td></tr><tr><td><code>publication_name</code></td><td>string</td><td>No</td><td>Filter by outlet name</td></tr><tr><td><code>publication_url</code></td><td>string</td><td>No</td><td>Filter by outlet domain</td></tr><tr><td><code>themes</code></td><td>array of string</td><td>No</td><td></td></tr><tr><td><code>topics</code></td><td>array of string</td><td>No</td><td></td></tr><tr><td><code>geo_focus</code></td><td>array of enum</td><td>No</td><td></td></tr><tr><td><code>coverage_locality</code></td><td>array of string</td><td>No</td><td></td></tr><tr><td><code>include_articles</code></td><td>boolean</td><td>No</td><td>Default <code>false</code></td></tr><tr><td><code>include_interactions</code></td><td>boolean</td><td>No</td><td>Default <code>false</code></td></tr><tr><td><code>page</code></td><td>integer</td><td>No</td><td>Default 1</td></tr><tr><td><code>page_size</code></td><td>integer</td><td>No</td><td>Default 10, max 100</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"pitch"</span>: <span class="s">"Northwind Robotics has closed a $42M Series B to expand its cold-chain robotics line. The wider story is that refrigerated warehouses have the sharpest labour shortage in logistics and the least automation, because conventional robots fail below freezing on battery, sensors, and materials. Dana Reyes, CEO, is available to explain why."</span>,
+  <span class="k">"themes"</span>: [<span class="s">"Supply chain"</span>, <span class="s">"Robotics"</span>],
+  <span class="k">"include_articles"</span>: <span class="b">true</span>,
+  <span class="k">"page_size"</span>: <span class="n">25</span>
+}</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"journalists"</span>: [
+      {
+        <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
+        <span class="k">"name"</span>: <span class="s">"Adaeze Nwankwo"</span>,
+        <span class="k">"employment"</span>: <span class="s">"Senior Logistics Correspondent"</span>,
+        <span class="k">"publication"</span>: <span class="s">"Cascade Business Daily"</span>,
+        <span class="k">"image_url"</span>: <span class="s">"https://cdn.example.com/j/88412.jpg"</span>,
+        <span class="k">"twitter_bio"</span>: <span class="s">"Covering supply chain and warehouse operations. Tips welcome."</span>,
+        <span class="k">"linkedin_url"</span>: <span class="s">"https://www.linkedin.com/in/adaeze-nwankwo-reports"</span>,
+        <span class="k">"x_handle"</span>: <span class="s">"@adaeze_reports"</span>,
+        <span class="k">"location"</span>: <span class="s">"Chicago, Illinois, United States"</span>,
+        <span class="k">"geo_focus"</span>: <span class="s">"NATIONAL"</span>,
+        <span class="k">"job_titles"</span>: [<span class="s">"JOURNALIST"</span>],
+        <span class="k">"is_high_response_rate"</span>: <span class="b">true</span>,
+        <span class="k">"is_pay_to_play"</span>: <span class="b">false</span>,
+        <span class="k">"themes"</span>: [<span class="s">"Supply chain"</span>, <span class="s">"Logistics technology"</span>],
+        <span class="k">"topics"</span>: [<span class="s">"warehouse automation"</span>, <span class="s">"cold chain"</span>, <span class="s">"labour"</span>],
+        <span class="k">"dynamic_tags"</span>: [<span class="s">"warehouse automation"</span>, <span class="s">"3PL"</span>],
+        <span class="k">"coverage_localities"</span>: [{ <span class="k">"country"</span>: <span class="s">"us"</span>, <span class="k">"state"</span>: <span class="s">"il"</span> }],
+        <span class="k">"publications"</span>: [
+          { <span class="k">"publication_id"</span>: <span class="n">4471</span>, <span class="k">"name"</span>: <span class="s">"Cascade Business Daily"</span>, <span class="k">"domain"</span>: <span class="s">"cascadebusinessdaily.com"</span> }
+        ],
+        <span class="k">"is_contactable"</span>: <span class="b">true</span>,
+        <span class="k">"last_verified_at"</span>: <span class="s">"2026-08-11T00:00:00Z"</span>,
+        <span class="k">"last_contacted_at"</span>: <span class="s">"2026-06-02T14:22:00Z"</span>,
+        <span class="k">"sent"</span>: <span class="n">3</span>,
+        <span class="k">"opened"</span>: <span class="n">2</span>,
+        <span class="k">"replied"</span>: <span class="n">1</span>,
+        <span class="k">"wrote_about_us"</span>: <span class="n">1</span>,
+        <span class="k">"articles"</span>: [
+          {
+            <span class="k">"article_id"</span>: <span class="n">991204</span>,
+            <span class="k">"title"</span>: <span class="s">"Cold storage operators turn to automation as staffing gaps widen"</span>,
+            <span class="k">"external_url"</span>: <span class="s">"https://www.cascadebusinessdaily.com/logistics/cold-storage-automation-staffing"</span>,
+            <span class="k">"publish_date"</span>: <span class="s">"2026-08-17"</span>,
+            <span class="k">"publication"</span>: <span class="s">"cascadebusinessdaily.com"</span>,
+            <span class="k">"excerpt"</span>: <span class="s">"Refrigerated warehouse operators across the Midwest report unfilled shifts at rates double the industry average."</span>
+          }
+        ]
+      },
+      {
+        <span class="k">"journalist_id"</span>: <span class="n">90233</span>,
+        <span class="k">"name"</span>: <span class="s">"Tobias Lindqvist"</span>,
+        <span class="k">"employment"</span>: <span class="s">"Venture Capital Reporter"</span>,
+        <span class="k">"publication"</span>: <span class="s">"The Bellweather Review"</span>,
+        <span class="k">"image_url"</span>: <span class="b">null</span>,
+        <span class="k">"twitter_bio"</span>: <span class="s">"Private markets, industrial tech."</span>,
+        <span class="k">"linkedin_url"</span>: <span class="b">null</span>,
+        <span class="k">"x_handle"</span>: <span class="s">"@tlindqvist"</span>,
+        <span class="k">"location"</span>: <span class="s">"New York, New York, United States"</span>,
+        <span class="k">"geo_focus"</span>: <span class="s">"NATIONAL"</span>,
+        <span class="k">"job_titles"</span>: [<span class="s">"JOURNALIST"</span>],
+        <span class="k">"is_high_response_rate"</span>: <span class="b">false</span>,
+        <span class="k">"is_pay_to_play"</span>: <span class="b">false</span>,
+        <span class="k">"themes"</span>: [<span class="s">"Venture capital"</span>, <span class="s">"Industrial technology"</span>],
+        <span class="k">"topics"</span>: [<span class="s">"startup funding"</span>, <span class="s">"robotics"</span>],
+        <span class="k">"dynamic_tags"</span>: [<span class="s">"venture capital"</span>],
+        <span class="k">"coverage_localities"</span>: [{ <span class="k">"country"</span>: <span class="s">"us"</span>, <span class="k">"state"</span>: <span class="s">"ny"</span> }],
+        <span class="k">"publications"</span>: [
+          { <span class="k">"publication_id"</span>: <span class="n">5120</span>, <span class="k">"name"</span>: <span class="s">"The Bellweather Review"</span>, <span class="k">"domain"</span>: <span class="s">"bellweatherreview.com"</span> }
+        ],
+        <span class="k">"is_contactable"</span>: <span class="b">true</span>,
+        <span class="k">"last_verified_at"</span>: <span class="s">"2026-08-14T00:00:00Z"</span>,
+        <span class="k">"last_contacted_at"</span>: <span class="b">null</span>,
+        <span class="k">"sent"</span>: <span class="n">0</span>,
+        <span class="k">"opened"</span>: <span class="n">0</span>,
+        <span class="k">"replied"</span>: <span class="n">0</span>,
+        <span class="k">"wrote_about_us"</span>: <span class="n">0</span>,
+        <span class="k">"articles"</span>: []
+      }
+    ],
+    <span class="k">"total"</span>: <span class="n">47</span>,
+    <span class="k">"page"</span>: <span class="n">1</span>,
+    <span class="k">"page_size"</span>: <span class="n">25</span>
+  }
+}</code></pre></div>
+<p><strong>Field reference</strong></p>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Null?</th><th>Notes</th></tr></thead><tbody><tr><td><code>journalist_id</code></td><td>integer</td><td>No</td><td>Use this to target campaigns and outreach</td></tr><tr><td><code>name</code></td><td>string</td><td>No</td><td><strong>Display copy</strong></td></tr><tr><td><code>employment</code></td><td>string</td><td>Yes</td><td><strong>Display copy.</strong> Job title as published.</td></tr><tr><td><code>publication</code></td><td>string</td><td>Yes</td><td><strong>Display copy.</strong> Primary outlet.</td></tr><tr><td><code>image_url</code></td><td>string</td><td>Yes</td><td></td></tr><tr><td><code>twitter_bio</code></td><td>string</td><td>Yes</td><td><strong>Display copy</strong></td></tr><tr><td><code>linkedin_url</code>, <code>x_handle</code></td><td>string</td><td>Yes</td><td>Public professional profiles</td></tr><tr><td><code>location</code></td><td>string</td><td>Yes</td><td><strong>Display copy</strong></td></tr><tr><td><code>geo_focus</code></td><td>enum</td><td>Yes</td><td>Coverage scope</td></tr><tr><td><code>job_titles</code></td><td>array of enum</td><td>No</td><td><code>JOURNALIST</code>, <code>EDITOR</code>, <code>CONTRIBUTOR</code>, <code>FREELANCE_WRITER</code>, <code>PRODUCER</code>, <code>ANCHOR</code>, <code>MARKETING_PR_LEAD</code>, <code>NON_EDITORIAL</code></td></tr><tr><td><code>is_high_response_rate</code></td><td>boolean</td><td>No</td><td>Responds to outreach more often than typical</td></tr><tr><td><code>is_pay_to_play</code></td><td>boolean</td><td>No</td><td>Outlet expects payment for coverage</td></tr><tr><td><code>themes</code>, <code>topics</code>, <code>dynamic_tags</code></td><td>array of string</td><td>No</td><td><strong>Display copy.</strong> May be empty.</td></tr><tr><td><code>coverage_localities</code></td><td>array of object</td><td>No</td><td>ISO country and state codes</td></tr><tr><td><code>publications</code></td><td>array of object</td><td>No</td><td>Affiliated outlets</td></tr><tr><td><code>is_contactable</code></td><td>boolean</td><td>No</td><td><strong>Check before targeting.</strong> See below.</td></tr><tr><td><code>last_verified_at</code></td><td>timestamp</td><td>Yes</td><td>See §9.4</td></tr><tr><td><code>last_contacted_at</code></td><td>timestamp</td><td>Yes</td><td>Your last contact. <code>null</code> if never.</td></tr><tr><td><code>sent</code>, <code>opened</code>, <code>replied</code>, <code>wrote_about_us</code></td><td>integer</td><td>No</td><td>Your history with this journalist</td></tr><tr><td><code>articles</code></td><td>array</td><td>No</td><td>Only when <code>include_articles: true</code></td></tr></tbody></table></div>
+<p><strong><code>is_contactable</code> is the field that prevents runtime failures.</strong> It is <code>false</code> when no usable contact route exists. <strong>Journalists with <code>is_contactable: false</code> are excluded when a campaign is created</strong> — so a 40-journalist list can resolve to 34 recipients, and a list where none are contactable fails outright with <code>no_contactable_recipients</code>.</p>
+<p>Filter on this before showing journalists as selectable, and after creating a campaign, read back the resolved recipients (§6.6) and show your users the actual count rather than the requested one.</p>
+<p><strong><code>sent</code>, <code>opened</code>, <code>replied</code> and <code>wrote_about_us</code> are your account's history only.</strong> You cannot see another customer's activity with a journalist, and they cannot see yours.</p>
+<h4 id="post-api-v1-journalists-search" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/journalists/search</code></h4>
+<p>Direct search by name, outlet or attribute.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:journalists</code></td></tr><tr><td><strong>Typical latency</strong></td><td>300 ms</td></tr></tbody></table></div>
+<p>Accepts <code>query</code>, <code>journalist_name</code>, <code>publication_name</code>, <code>publication_url</code>, <code>job_tags</code>, <code>themes</code>, <code>topics</code>, <code>geo_focus</code>, <code>coverage_locality</code>, <code>reach</code>, <code>interactions</code>, plus expansion flags and pagination.</p>
+<h4 id="post-api-v1-journalists-lookup" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/journalists/lookup</code></h4>
+<p>Retrieve specific journalists by ID.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:journalists</code></td></tr><tr><td><strong>Typical latency</strong></td><td>200 ms</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>, <span class="n">90233</span>], <span class="k">"include_articles"</span>: <span class="b">true</span>, <span class="k">"include_interactions"</span>: <span class="b">true</span> }</code></pre></div>
+<p>1–100 IDs per call.</p>
+<p><strong>Use this to refresh anything you cache.</strong> <code>is_contactable</code> changes without notice as delivery failures and opt-outs occur, so a cached <code>true</code> can be stale. Re-check before a campaign rather than trusting stored data.</p>
+<hr>
+<h3 id="6-5-story-discovery">6.5 Story discovery</h3>
+<h4 id="post-api-v1-stories-trending" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/stories/trending</code></h4>
+<p>Top stories from a recent window — the entry point for timely, newsjacking outreach.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:articles</code></td></tr><tr><td><strong>Typical latency</strong></td><td>400 ms</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Notes</th></tr></thead><tbody><tr><td><code>lookback_hours</code></td><td>integer</td><td>168</td><td><strong>Use <code>72</code> for the last three days</strong></td></tr><tr><td><code>search_term</code></td><td>string</td><td>—</td><td>Narrow the results</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"lookback_hours"</span>: <span class="n">72</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"top_stories"</span>: [
+      {
+        <span class="k">"title"</span>: <span class="s">"Cold storage operators turn to automation as staffing gaps widen"</span>,
+        <span class="k">"description"</span>: <span class="s">"Refrigerated warehouse operators across the Midwest report unfilled shifts at rates double the industry average, pushing several to trial robotics previously considered too costly for the segment."</span>,
+        <span class="k">"url"</span>: <span class="s">"/articles/991204"</span>,
+        <span class="k">"external_url"</span>: <span class="s">"https://www.cascadebusinessdaily.com/logistics/cold-storage-automation-staffing"</span>,
+        <span class="k">"publish_date"</span>: <span class="s">"2026-08-17"</span>,
+        <span class="k">"publications"</span>: [
+          { <span class="k">"publication_id"</span>: <span class="n">4471</span>, <span class="k">"name"</span>: <span class="s">"Cascade Business Daily"</span>, <span class="k">"domain"</span>: <span class="s">"cascadebusinessdaily.com"</span> }
+        ]
+      },
+      {
+        <span class="k">"title"</span>: <span class="s">"Warehouse robotics funding rebounds after two flat quarters"</span>,
+        <span class="k">"description"</span>: <span class="s">"Venture investment in warehouse automation reached $1.4 billion in the second quarter, reversing a decline that began in late 2025, with mid-market focused companies capturing a growing share."</span>,
+        <span class="k">"url"</span>: <span class="s">"/articles/991180"</span>,
+        <span class="k">"external_url"</span>: <span class="s">"https://www.bellweatherreview.com/venture/warehouse-robotics-funding-q2"</span>,
+        <span class="k">"publish_date"</span>: <span class="s">"2026-08-16"</span>,
+        <span class="k">"publications"</span>: [
+          { <span class="k">"publication_id"</span>: <span class="n">5120</span>, <span class="k">"name"</span>: <span class="s">"The Bellweather Review"</span>, <span class="k">"domain"</span>: <span class="s">"bellweatherreview.com"</span> }
+        ]
+      }
+    ]
+  }
+}</code></pre></div>
+<p><strong>Link your users to <code>external_url</code></strong> — the publisher's canonical URL. <code>url</code> is a platform-relative path.</p>
+<p>To find the journalists behind a story, pass its <code>article_id</code> to <code>POST /api/v1/articles/lookup</code>; the response includes bylined authors with their journalist IDs. That is the start of the 1:1 outreach flow in §11.4.</p>
+<h4 id="other-discovery-endpoints">Other discovery endpoints</h4>
+<div class="tablewrap"><table><thead><tr><th>Method</th><th>Path</th><th>Scope</th><th>Purpose</th></tr></thead><tbody><tr><td><code>POST</code></td><td><code>/api/v1/articles/search</code></td><td><code>read:articles</code></td><td>Article search with theme, date and competitor-mention filters</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/articles/relevant</code></td><td><code>read:articles</code></td><td>Articles most relevant to your profile</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/articles/lookup</code></td><td><code>read:articles</code></td><td>Articles by ID, with bylines</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/publications/search</code></td><td><code>read:publications</code></td><td>Outlets by traffic and authority band</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/publications/lookup</code></td><td><code>read:publications</code></td><td>Outlets by ID</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/podcasts/search</code></td><td><code>read:publications</code></td><td>Podcasts, filterable on guest and sponsor acceptance</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/podcasts/lookup</code></td><td><code>read:publications</code></td><td>Podcasts by ID, with episodes</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/lists</code></td><td><code>write:lists</code></td><td>Save a journalist or podcast list</td></tr><tr><td><code>GET</code></td><td><code>/api/v1/lists/{list_id}</code></td><td><code>read:lists</code></td><td>Retrieve a list with members</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/lists/search</code></td><td><code>read:lists</code></td><td>Search your saved lists</td></tr></tbody></table></div>
+<hr>
+<h3 id="6-6-pitch-generation">6.6 Pitch generation</h3>
+<p>Generation and campaign creation are separate steps, which lets your users review copy before anything is sent.</p>
+<p>All generation endpoints are slow — see §5.1 — and all return <strong>Display copy</strong> intended for human review.</p>
+<h4 id="post-api-v1-pitches-generate" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/pitches/generate</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>12 s, up to 30 s</td></tr></tbody></table></div>
+<p>Supply exactly one of <code>comment</code>, <code>article_url</code> or <code>article_id</code>.</p>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>comment</code></td><td>string</td><td>One of three</td><td>Your angle or instruction</td></tr><tr><td><code>article_url</code></td><td>string</td><td>One of three</td><td>A story to pitch against</td></tr><tr><td><code>article_id</code></td><td>integer</td><td>One of three</td><td>A platform article ID</td></tr><tr><td><code>spokesperson_id</code></td><td>integer</td><td>No</td><td>Whom to offer and quote</td></tr><tr><td><code>pitch_length</code></td><td>enum</td><td>No</td><td><code>Concise</code>, <code>Standard</code>, <code>Detailed</code>. Default <code>Standard</code>.</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"comment"</span>: <span class="s">"We just closed a $42M Series B for our cold-chain robotics line. The real story is that refrigerated warehouses have the worst labour shortage in logistics and the least automation, because conventional robots fail below freezing."</span>,
+  <span class="k">"spokesperson_id"</span>: <span class="n">771</span>,
+  <span class="k">"pitch_length"</span>: <span class="s">"Standard"</span>
+}</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"pitch"</span>: <span class="s">"Hi {{first_name}},\n\nRefrigerated warehouses have the sharpest labour shortfall in logistics and the least automation — and those two facts are connected. Conventional warehouse robots fail below freezing on battery chemistry, sensor condensation, and materials embrittlement, so cold storage operators have been left out of the automation wave entirely.\n\nNorthwind Robotics just closed a $42M Series B to expand a robot line built for those conditions. We run fleets at 34 distribution centres, eleven of them refrigerated.\n\nDana Reyes, our CEO, can walk through why the conventional hardware fails and what the operational economics look like in cold storage. We can also share anonymised throughput and staffing data from the refrigerated deployments.\n\nUseful for anything you're working on?\n\nBest,\nPriya Raghunathan\nNorthwind Robotics"</span>
+  }
+}</code></pre></div>
+<p><strong><code>{{first_name}}</code> is a dynamic tag</strong> replaced per recipient at send time. Retrieve the supported set from <code>GET /api/v1/pitches/tags</code>. <strong>Preserve tags exactly when your users edit copy</strong> — a malformed tag is sent literally, which is an embarrassing failure in front of a journalist. Validate tags before accepting an edit.</p>
+<h4 id="post-api-v1-pitches-subject-line" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/pitches/subject-line</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>4 s</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall in logistics..."</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span> } }</code></pre></div>
+<p>Returns one subject line. Call again for alternatives.</p>
+<h4 id="post-api-v1-pitches-personalize" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/pitches/personalize</code></h4>
+<p>Per-journalist opening lines referencing that journalist's recent work.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>15 s, up to 45 s</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>pitch</code></td><td>string</td><td><strong>Yes</strong></td><td>The shared pitch body</td></tr><tr><td><code>journalist_ids</code></td><td>array of integer</td><td><strong>Yes</strong></td><td>1–50</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>, <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>, <span class="n">90233</span>] }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"personalizations"</span>: [
+      {
+        <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
+        <span class="k">"personalization_line"</span>: <span class="s">"Your piece last week on widening staffing gaps in cold storage got at something most warehouse automation coverage misses."</span>
+      },
+      {
+        <span class="k">"journalist_id"</span>: <span class="n">90233</span>,
+        <span class="k">"personalization_line"</span>: <span class="s">"Your Q2 analysis noted mid-market robotics companies taking a growing share of warehouse automation funding."</span>
+      }
+    ]
+  }
+}</code></pre></div>
+<p><strong>Batch 10–20 at a time</strong>, not the full 50. See §5.2.</p>
+<h4 id="post-api-v1-pitches-follow-up" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/pitches/follow-up</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>6 s</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"follow_up"</span>: <span class="s">"Following up briefly — the cold-chain deployment data I mentioned is ready if it's useful. Happy to send it over regardless of timing on your end.\n\nBest,\nPriya"</span> } }</code></pre></div>
+<p>Pass the result as <code>follow_up</code> when creating a campaign.</p>
+<hr>
+<h3 id="6-7-campaigns">6.7 Campaigns</h3>
+<h4 id="lifecycle">Lifecycle</h4>
+<p>A campaign has two phases, held as two separate records with <strong>different identifiers</strong>:</p>
+<div class="codewrap"><pre class="code"><code>   campaign draft                    campaign
+   (nothing sent)                    (launched)
+        │                                 │
+      DRAFT ──────── launch ──────────▶ ACTIVE ⇄ PAUSED
+        │                                 │
+   CANCELLED                              ▼
+                                       DELETED</code></pre></div>
+<p><strong>A campaign exists only once launched.</strong> Before that it is a draft with its own <code>draft_id</code>. A draft is not a campaign in a draft state.</p>
+<p><code>Campaign.status</code> values you will encounter:</p>
+<div class="tablewrap"><table><thead><tr><th>Status</th><th>Meaning</th><th>Can pause?</th><th>Can delete?</th></tr></thead><tbody><tr><td><code>ACTIVE</code></td><td>Sending or awaiting replies</td><td>Yes</td><td>Yes</td></tr><tr><td><code>PAUSED</code></td><td>Sending halted, resumable</td><td>—</td><td>Yes</td></tr><tr><td><code>DELETED</code></td><td>Cancelled. <strong>Terminal.</strong></td><td>No</td><td>No</td></tr></tbody></table></div>
+<p>Other values may appear on older campaigns — handle unrecognised values with a default branch (§4.1).</p>
+<h4 id="post-api-v1-campaigns-drafts" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/campaigns/drafts</code></h4>
+<p>Prepare a campaign without sending anything.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:campaigns</code></td></tr><tr><td><strong>Typical latency</strong></td><td>1.5 s</td></tr><tr><td><strong>Body limit</strong></td><td>25 MB</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>pitch</code></td><td>string</td><td><strong>Yes</strong></td><td>The body copy</td></tr><tr><td><code>subject_line</code></td><td>string</td><td><strong>Yes</strong></td><td>Min 1 char</td></tr><tr><td><code>journalists</code></td><td>array of object</td><td><strong>Yes</strong></td><td>Min 1</td></tr><tr><td><code>journalists[].journalist_id</code></td><td>integer</td><td><strong>Yes</strong></td><td></td></tr><tr><td><code>journalists[].personalization_line</code></td><td>string</td><td>No</td><td>Default <code>""</code></td></tr><tr><td><code>follow_up</code></td><td>string</td><td>No</td><td>Follow-up body</td></tr><tr><td><code>email_greeting</code></td><td>string, nullable</td><td>No</td><td></td></tr><tr><td><code>email_sign_off</code></td><td>string, nullable</td><td>No</td><td>Default <code>"Regards,"</code></td></tr><tr><td><code>name</code></td><td>string</td><td>No</td><td>Campaign name</td></tr><tr><td><code>files</code></td><td>array of object</td><td>No</td><td><code>{ filename, data, size }</code>, base64</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"name"</span>: <span class="s">"Series B — cold-chain angle"</span>,
+  <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall in logistics..."</span>,
+  <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span>,
+  <span class="k">"follow_up"</span>: <span class="s">"Following up briefly — the cold-chain deployment data I mentioned is ready if it's useful."</span>,
+  <span class="k">"journalists"</span>: [
+    { <span class="k">"journalist_id"</span>: <span class="n">88412</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your piece last week on widening staffing gaps in cold storage got at something most warehouse automation coverage misses."</span> },
+    { <span class="k">"journalist_id"</span>: <span class="n">90233</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your Q2 analysis noted mid-market robotics companies taking a growing share of warehouse automation funding."</span> }
+  ],
+  <span class="k">"email_greeting"</span>: <span class="s">"Hi"</span>,
+  <span class="k">"email_sign_off"</span>: <span class="s">"Best,"</span>
+}</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"draft_id"</span>: <span class="n">7741</span> } }</code></pre></div>
+<p><strong>Error — no contactable recipients, <code>400</code>:</strong></p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"error"</span>: <span class="s">"None of the provided journalist IDs were found or have valid emails"</span>,
+  <span class="k">"code"</span>: <span class="s">"no_contactable_recipients"</span>,
+  <span class="k">"request_id"</span>: <span class="s">"req_5c9a13f78b2e4d06"</span>
+}</code></pre></div>
+<h4 id="post-api-v1-campaigns" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/campaigns</code></h4>
+<p>Launch a campaign.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:campaigns</code> <strong>and</strong> <code>write:emails</code></td></tr><tr><td><strong>Typical latency</strong></td><td>3 s, up to 12 s</td></tr><tr><td><strong>Body limit</strong></td><td>25 MB</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>pitch</code></td><td>string</td><td><strong>Yes</strong></td><td></td></tr><tr><td><code>subject_line</code></td><td>string</td><td><strong>Yes</strong></td><td></td></tr><tr><td><code>journalists</code></td><td>array of object</td><td><strong>Yes</strong></td><td>Min 1, as above</td></tr><tr><td><code>email_action</code></td><td>enum</td><td>No</td><td><code>send</code> or <code>draft</code>. <strong>Default <code>draft</code>.</strong></td></tr><tr><td><code>name</code></td><td>string</td><td>No</td><td></td></tr><tr><td><code>follow_up</code></td><td>string</td><td>No</td><td></td></tr><tr><td><code>follow_up_delay</code></td><td>integer</td><td>No</td><td>Days. Default 3.</td></tr><tr><td><code>use_ai_personalization</code></td><td>boolean</td><td>No</td><td>Default <code>false</code></td></tr><tr><td><code>pitch_type</code></td><td>string</td><td>No</td><td>Default <code>"interview"</code></td></tr><tr><td><code>call_to_action</code></td><td>string</td><td>No</td><td></td></tr><tr><td><code>email_greeting</code></td><td>string, nullable</td><td>No</td><td></td></tr><tr><td><code>email_sign_off</code></td><td>string, nullable</td><td>No</td><td></td></tr><tr><td><code>files</code></td><td>array of object</td><td>No</td><td>Base64 attachments</td></tr></tbody></table></div>
+<aside class="note"><p><strong><code>email_action</code> is the most consequential field in this API.</strong></p><ul><li><strong><code>draft</code></strong> (the default) — creates the campaign and per-journalist drafts. <strong>Nothing is sent.</strong></li><li><strong><code>send</code></strong> — dispatches email to real journalists. This cannot be undone.</li></ul><p>Set <code>send</code> only from a code path where a human has explicitly approved the copy and the recipient list. Keep it <code>draft</code> for all development and testing.</p></aside>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"name"</span>: <span class="s">"Series B — cold-chain angle"</span>,
+  <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall in logistics..."</span>,
+  <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span>,
+  <span class="k">"follow_up"</span>: <span class="s">"Following up briefly — the cold-chain deployment data is ready if useful."</span>,
+  <span class="k">"follow_up_delay"</span>: <span class="n">4</span>,
+  <span class="k">"journalists"</span>: [
+    { <span class="k">"journalist_id"</span>: <span class="n">88412</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your piece last week on cold storage staffing..."</span> },
+    { <span class="k">"journalist_id"</span>: <span class="n">90233</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your Q2 analysis noted mid-market robotics..."</span> }
+  ],
+  <span class="k">"email_action"</span>: <span class="s">"draft"</span>,
+  <span class="k">"use_ai_personalization"</span>: <span class="b">true</span>,
+  <span class="k">"pitch_type"</span>: <span class="s">"announcement"</span>,
+  <span class="k">"call_to_action"</span>: <span class="s">"Interview with Dana Reyes"</span>,
+  <span class="k">"email_greeting"</span>: <span class="s">"Hi"</span>,
+  <span class="k">"email_sign_off"</span>: <span class="s">"Best,"</span>
+}</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"campaign_id"</span>: <span class="n">33914</span> } }</code></pre></div>
+<p><strong>Before you call this:</strong></p>
+<p><strong>A connected mailbox is required.</strong> Without one the call fails with <code>no_valid_sender</code>. Check <code>GET /api/v1/senders</code> and confirm <code>can_send: true</code> (§8.3).</p>
+<p><strong>Handle timeouts carefully.</strong> If this call times out, the campaign may have been created. <strong>Do not blindly retry</strong> — call <code>GET /api/v1/campaigns</code> filtered by name and recent date to check, and retry only if it is absent. Retrying blindly with <code>email_action: "send"</code> risks sending every pitch twice.</p>
+<p><strong>Error — no mailbox, <code>422</code>:</strong></p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"error"</span>: <span class="s">"No connected mailbox is available. Connect a sending mailbox before launching a campaign."</span>,
+  <span class="k">"code"</span>: <span class="s">"no_valid_sender"</span>,
+  <span class="k">"request_id"</span>: <span class="s">"req_5c9a13f78b2e4d06"</span>
+}</code></pre></div>
+<h4 id="get-api-v1-campaigns" class="endpoint"><span class="method m-get">GET</span><code class="path">/api/v1/campaigns</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:campaigns</code></td></tr><tr><td><strong>Typical latency</strong></td><td>200 ms</td></tr></tbody></table></div>
+<p>Filters: <code>campaign_ids</code>, <code>date_range</code>.</p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"campaigns"</span>: [
+      {
+        <span class="k">"campaign_id"</span>: <span class="n">33914</span>,
+        <span class="k">"name"</span>: <span class="s">"Series B — cold-chain angle"</span>,
+        <span class="k">"status"</span>: <span class="s">"ACTIVE"</span>,
+        <span class="k">"status_label"</span>: <span class="s">"Active"</span>,
+        <span class="k">"campaign_type"</span>: <span class="s">"ONGOING"</span>,
+        <span class="k">"campaign_target_type"</span>: <span class="s">"JOURNALIST"</span>,
+        <span class="k">"subject"</span>: <span class="s">"Why warehouse robots fail below freezing"</span>,
+        <span class="k">"call_to_action"</span>: <span class="s">"Interview with Dana Reyes"</span>,
+        <span class="k">"pitch_type"</span>: <span class="s">"announcement"</span>,
+        <span class="k">"use_ai_personalization"</span>: <span class="b">true</span>,
+        <span class="k">"send_followup_email"</span>: <span class="b">true</span>,
+        <span class="k">"followup_delay"</span>: <span class="n">4</span>,
+        <span class="k">"stats"</span>: {
+          <span class="k">"journalists_targeted"</span>: <span class="n">34</span>,
+          <span class="k">"emails_scheduled"</span>: <span class="n">6</span>,
+          <span class="k">"emails_sent"</span>: <span class="n">28</span>,
+          <span class="k">"emails_opened"</span>: <span class="n">14</span>,
+          <span class="k">"emails_clicked"</span>: <span class="n">3</span>,
+          <span class="k">"emails_bounced"</span>: <span class="n">1</span>,
+          <span class="k">"emails_replied"</span>: <span class="n">5</span>
+        },
+        <span class="k">"created_at"</span>: <span class="s">"2026-08-18T11:20:00Z"</span>,
+        <span class="k">"updated_at"</span>: <span class="s">"2026-08-19T08:12:44Z"</span>
+      }
+    ]
+  }
+}</code></pre></div>
+<p><code>campaign_type</code>: <code>BLAST</code>, <code>ONGOING</code>. <code>campaign_target_type</code>: <code>JOURNALIST</code>, <code>PODCAST</code>.</p>
+<p><strong>Interpreting <code>stats</code>.</strong> Counts are of distinct messages, not events — a message opened five times counts once.</p>
+<p><strong>Open and click tracking is unreliable in both directions</strong>, and this matters for how you present it. Many journalists use mail clients that block tracking images, so a real read may not register. Privacy proxies pre-fetch images, generating opens that never involved a human. <strong>Never present opens as proof a pitch was read, and never treat the absence of an open as proof it was not.</strong> <code>emails_replied</code> is the only dependable engagement signal — build your reporting around it.</p>
+<h4 id="get-api-v1-campaigns-campaign-id-journalists" class="endpoint"><span class="method m-get">GET</span><code class="path">/api/v1/campaigns/{campaign_id}/journalists</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:campaigns</code></td></tr><tr><td><strong>Typical latency</strong></td><td>300 ms</td></tr></tbody></table></div>
+<p>The journalists actually targeted, with per-journalist status. <strong>Call this after launch</strong> to reconcile requested against resolved recipients and show your users the real number.</p>
+<h4 id="patch-api-v1-campaigns-campaign-id" class="endpoint"><span class="method m-patch">PATCH</span><code class="path">/api/v1/campaigns/{campaign_id}</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:campaigns</code></td></tr><tr><td><strong>Typical latency</strong></td><td>200 ms</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"status"</span>: <span class="s">"PAUSED"</span> }</code></pre></div>
+<p>Accepts <code>ACTIVE</code>, <code>PAUSED</code>, <code>DELETED</code>.</p>
+<div class="tablewrap"><table><thead><tr><th>Transition</th><th>Effect</th></tr></thead><tbody><tr><td>→ <code>PAUSED</code></td><td>Halts pending sends. Already-sent email cannot be recalled. Replies still arrive.</td></tr><tr><td>→ <code>ACTIVE</code></td><td>Resumes sending.</td></tr><tr><td>→ <code>DELETED</code></td><td><strong>Terminal.</strong> Cancels pending sends and removes associated email records.</td></tr></tbody></table></div>
+<p>There is no separate cancel operation — <code>DELETED</code> is cancellation.</p>
+<hr>
+<h3 id="6-8-direct-outreach-and-replies">6.8 Direct outreach and replies</h3>
+<h4 id="post-api-v1-outreach-generate" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/outreach/generate</code></h4>
+<p>Generate a 1:1 email to a single journalist — typically the author of a story you just surfaced.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>10 s, up to 25 s</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead><tbody><tr><td><code>journalist_id</code></td><td>integer</td><td><strong>Yes</strong></td><td></td></tr><tr><td><code>email_type</code></td><td>enum</td><td><strong>Yes</strong></td><td>See <code>GET /api/v1/outreach/types</code></td></tr><tr><td><code>data_point</code></td><td>string</td><td>No</td><td>A statistic or fact to anchor on</td></tr><tr><td><code>article_ids</code></td><td>array of integer</td><td>No</td><td>Articles by this journalist to reference</td></tr><tr><td><code>company_mention_article_ids</code></td><td>array of integer</td><td>No</td><td>Stories mentioning you</td></tr><tr><td><code>competitor_mention_articles</code></td><td>array of object</td><td>No</td><td><code>{ article_id, brand }</code></td></tr><tr><td><code>competitor_name</code></td><td>string</td><td>No</td><td></td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
+  <span class="k">"email_type"</span>: <span class="s">"ARTICLE_FOLLOW_UP"</span>,
+  <span class="k">"article_ids"</span>: [<span class="n">991204</span>],
+  <span class="k">"data_point"</span>: <span class="s">"Eleven of our 34 deployed fleets run in refrigerated facilities."</span>
+}</code></pre></div>
+<p>Returns subject and body as <strong>Display copy</strong> for review.</p>
+<h4 id="post-api-v1-emails" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/emails</code></h4>
+<p>Send a 1:1 email.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:emails</code></td></tr><tr><td><strong>Typical latency</strong></td><td>1 s</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>journalist_id</code></td><td>integer</td><td><strong>Yes</strong></td><td>Must be contactable</td></tr><tr><td><code>subject_line</code></td><td>string</td><td><strong>Yes</strong></td><td>Min 1 char</td></tr><tr><td><code>email_body</code></td><td>string</td><td><strong>Yes</strong></td><td>Min 1 char</td></tr><tr><td><code>cc</code></td><td>string</td><td>No</td><td>Valid email address</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
+  <span class="k">"subject_line"</span>: <span class="s">"Your cold storage staffing piece — operator data available"</span>,
+  <span class="k">"email_body"</span>: <span class="s">"Hi Adaeze,\n\nYour piece on widening staffing gaps in cold storage matched what we see operationally...\n\nBest,\nPriya"</span>
+}</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"email_id"</span>: <span class="n">884120</span> } }</code></pre></div>
+<aside class="note"><p><strong>This sends immediately.</strong> Unlike campaigns, there is no draft default on this endpoint. Confirm with your user before calling it.</p></aside>
+<h4 id="reading-email-and-replies">Reading email and replies</h4>
+<div class="tablewrap"><table><thead><tr><th>Method</th><th>Path</th><th>Scope</th><th>Purpose</th></tr></thead><tbody><tr><td><code>POST</code></td><td><code>/api/v1/emails/sent</code></td><td><code>read:emails</code></td><td>Sent email</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/emails/drafted</code></td><td><code>read:emails</code></td><td>Drafted, unsent</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/emails/scheduled</code></td><td><code>read:emails</code></td><td>Queued for future send</td></tr><tr><td><code>POST</code></td><td><code>/api/v1/interactions</code></td><td><code>read:interactions</code></td><td><strong>Classified replies</strong></td></tr></tbody></table></div>
+<p>All accept <code>journalist_id</code>, an ID filter, and <code>date_range</code>.</p>
+<h4 id="post-api-v1-interactions" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/interactions</code></h4>
+<p><strong>This is how you learn a journalist replied.</strong></p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"date_range"</span>: { <span class="k">"start_date"</span>: <span class="s">"2026-08-18"</span>, <span class="k">"end_date"</span>: <span class="s">"2026-08-20"</span> } }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"interactions"</span>: [
+      {
+        <span class="k">"interaction_id"</span>: <span class="n">55120</span>,
+        <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
+        <span class="k">"journalist_name"</span>: <span class="s">"Adaeze Nwankwo"</span>,
+        <span class="k">"campaign_id"</span>: <span class="n">33914</span>,
+        <span class="k">"email_id"</span>: <span class="n">884120</span>,
+        <span class="k">"type"</span>: <span class="s">"POSITIVE_REPLY"</span>,
+        <span class="k">"type_label"</span>: <span class="s">"Positive reply"</span>,
+        <span class="k">"communication_type"</span>: <span class="s">"EMAIL"</span>,
+        <span class="k">"date"</span>: <span class="s">"2026-08-19"</span>,
+        <span class="k">"created_at"</span>: <span class="s">"2026-08-19T08:12:44Z"</span>,
+        <span class="k">"body"</span>: <span class="s">"Priya — yes, interested. I'm filing a follow-up on refrigerated staffing for early next week.\n\nCould Dana do 20 minutes Thursday or Friday morning? And I'd take the deployment data if you can send it before then — particularly anything on turnover rates before and after.\n\nAdaeze"</span>
+      }
+    ]
+  }
+}</code></pre></div>
+<p><code>type</code> values, and how to route them:</p>
+<div class="tablewrap"><table><thead><tr><th><code>type</code></th><th>Suggested handling</th></tr></thead><tbody><tr><td><code>POSITIVE_REPLY</code></td><td>Notify immediately. Highest value.</td></tr><tr><td><code>INTERVIEW_SCHEDULED</code></td><td>Notify immediately.</td></tr><tr><td><code>REQUESTED_BYLINE</code>, <code>SENT_BYLINE</code></td><td>Route to whoever produces content.</td></tr><tr><td><code>SENT_INFORMATION</code>, <code>AWAITING_PUBLICATION</code></td><td>Track for follow-through.</td></tr><tr><td><code>WROTE_ABOUT_US</code></td><td>Coverage won. Surface prominently.</td></tr><tr><td><code>NEUTRAL_REPLY</code>, <code>NEW_RELATIONSHIP</code></td><td>Queue for review.</td></tr><tr><td><code>NEGATIVE_REPLY</code></td><td>Notify. Consider excluding from future targeting.</td></tr><tr><td><code>PAY_TO_PLAY</code></td><td>Outlet wants payment. Route to a decision-maker.</td></tr><tr><td><code>OUT_OF_OFFICE</code></td><td>Suppress notification. Follow up later.</td></tr><tr><td><code>BOUNCE</code></td><td>Mark undeliverable in your records.</td></tr><tr><td><code>UNSUBSCRIBED</code></td><td><strong>Act immediately</strong> — see §10.5.</td></tr><tr><td><code>NOT_TAGGED</code>, <code>OTHER</code></td><td>Queue for manual review.</td></tr></tbody></table></div>
+<p><code>communication_type</code>: <code>PHONE_CALL</code>, <code>INTERVIEW</code>, <code>EMAIL</code>, <code>OTHER</code>.</p>
+<p><strong>Poll this endpoint to detect replies.</strong> Every five minutes with an overlapping date window is a good balance; de-duplicate on <code>interaction_id</code>. Push notifications are on the roadmap (§12).</p>
+<h4 id="post-api-v1-emails-email-id-reply" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/emails/{email_id}/reply</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:emails</code></td></tr><tr><td><strong>Typical latency</strong></td><td>1 s</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"interaction_id"</span>: <span class="n">55120</span>,
+  <span class="k">"email_body"</span>: <span class="s">"Adaeze — Thursday 9am Pacific works for Dana. I'll send the deployment data with turnover figures this afternoon.\n\nPriya"</span>
+}</code></pre></div>
+<p>Threading and sender selection are handled for you.</p>
+<hr>
+<h3 id="6-9-wire-releases">6.9 Wire releases</h3>
+<h4 id="post-api-v1-wire-releases" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/wire-releases</code></h4>
+<p>Submit a press release for distribution, or save it as a draft.</p>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:wire</code></td></tr><tr><td><strong>Typical latency</strong></td><td>400 ms</td></tr><tr><td><strong>Body limit</strong></td><td>25 MB</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>headline</code></td><td>string</td><td><strong>Yes</strong></td><td>Min 1 char</td></tr><tr><td><code>content</code></td><td>string</td><td><strong>Yes</strong></td><td><strong>Markdown.</strong> Converted to HTML on submission.</td></tr><tr><td><code>categories</code></td><td>array of string</td><td><strong>Yes</strong></td><td>1–5, from the supported list</td></tr><tr><td><code>contact_info</code></td><td>object</td><td>No</td><td></td></tr><tr><td><code>contact_info.name</code></td><td>string</td><td>No</td><td></td></tr><tr><td><code>contact_info.email</code></td><td>string</td><td>No</td><td>Valid email</td></tr><tr><td><code>contact_info.phone</code></td><td>string</td><td>No</td><td></td></tr><tr><td><code>launch</code></td><td>object</td><td>Conditional</td><td>Required to distribute</td></tr><tr><td><code>launch.date</code></td><td>string</td><td><strong>Yes</strong> if <code>launch</code></td><td><code>YYYY-MM-DD</code></td></tr><tr><td><code>launch.time</code></td><td>string</td><td><strong>Yes</strong> if <code>launch</code></td><td><code>HH:mm</code>, 24-hour</td></tr><tr><td><code>launch.timezone</code></td><td>string</td><td><strong>Yes</strong> if <code>launch</code></td><td>IANA zone from the supported list</td></tr><tr><td><code>release_type</code></td><td>enum</td><td>No</td><td>Default <code>PRESS_RELEASE</code></td></tr><tr><td><code>save_as_draft</code></td><td>boolean</td><td>No</td><td>Defaults to <code>true</code> when <code>launch</code> is absent</td></tr></tbody></table></div>
+<p><strong>Draft or distribute.</strong> Omit <code>launch</code>, or set <code>save_as_draft: true</code>, and the release is stored as a draft. To distribute, supply <code>launch</code> and do not set <code>save_as_draft</code>.</p>
+<p><strong>Fetch the valid lists rather than hardcoding them</strong> — <code>GET /api/v1/wire-releases/categories</code> and <code>GET /api/v1/wire-releases/timezones</code>. Both change over time.</p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"headline"</span>: <span class="s">"Northwind Robotics Raises $42M Series B to Expand Cold-Chain Automation"</span>,
+  <span class="k">"content"</span>: <span class="s">"**PORTLAND, Ore.** — Northwind Robotics, a developer of autonomous mobile robots for distribution centres, today announced a $42 million Series B financing led by Cascadia Ventures, with participation from existing investors Tallwood Partners and Ridgeline Capital.\n\nThe company will use the funding to expand its cold-chain product line, which operates in refrigerated environments down to -20C where conventional warehouse robotics degrade rapidly. Northwind currently operates fleets at 34 distribution centres across the United States and Canada.\n\n\"Cold storage is the hardest environment in fulfilment and the least automated,\" said Dana Reyes, chief executive officer of Northwind Robotics. \"Operators there are facing the sharpest labour shortages in the industry, and the existing robotics options simply were not built for the conditions.\"\n\nThe Series B brings total funding to $71 million.\n\n### About Northwind Robotics\n\nNorthwind Robotics builds autonomous mobile robots and fleet management software for mid-market distribution centres. Founded in 2019 and headquartered in Portland, Oregon, Northwind operates at 34 facilities across North America."</span>,
+  <span class="k">"categories"</span>: [<span class="s">"Business &amp; Economy"</span>, <span class="s">"Technology"</span>, <span class="s">"Logistics &amp; Transportation"</span>],
+  <span class="k">"contact_info"</span>: {
+    <span class="k">"name"</span>: <span class="s">"Priya Raghunathan"</span>,
+    <span class="k">"email"</span>: <span class="s">"press@northwindrobotics.com"</span>,
+    <span class="k">"phone"</span>: <span class="s">"+1-503-555-0148"</span>
+  },
+  <span class="k">"launch"</span>: {
+    <span class="k">"date"</span>: <span class="s">"2026-08-20"</span>,
+    <span class="k">"time"</span>: <span class="s">"09:00"</span>,
+    <span class="k">"timezone"</span>: <span class="s">"America/New_York"</span>
+  },
+  <span class="k">"release_type"</span>: <span class="s">"PRESS_RELEASE"</span>
+}</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"release_id"</span>: <span class="n">5512</span>,
+    <span class="k">"guid"</span>: <span class="s">"b7e41f92-3c8a-4d61-9e05-2f8c47a19e3d"</span>,
+    <span class="k">"status"</span>: <span class="s">"PENDING"</span>,
+    <span class="k">"pub_date"</span>: <span class="s">"2026-08-20T13:00:00Z"</span>,
+    <span class="k">"scheduled_timezone"</span>: <span class="s">"America/New_York"</span>
+  }
+}</code></pre></div>
+<div class="tablewrap"><table><thead><tr><th><code>status</code></th><th>Meaning</th></tr></thead><tbody><tr><td><code>DRAFT</code></td><td>Saved, not submitted</td></tr><tr><td><code>PENDING</code></td><td>Submitted for distribution, awaiting pickup</td></tr><tr><td><code>PUBLISHED</code></td><td>Published</td></tr></tbody></table></div>
+<p><code>pub_date</code> is your wall-clock launch time resolved to UTC — useful for confirming the timezone was interpreted as you intended.</p>
+<p><strong>Include <code>contact_info</code>.</strong> A release without a media contact gives an interested journalist no way to follow up, which wastes the distribution.</p>
+<p><strong>Error — no launch time, <code>400</code>:</strong></p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"error"</span>: <span class="s">"A launch date/time is required to submit a release. Omit save_as_draft or set it to true to save a draft."</span>,
+  <span class="k">"code"</span>: <span class="s">"invalid_request"</span>,
+  <span class="k">"request_id"</span>: <span class="s">"req_8c14f7a92e5d3b60"</span>
+}</code></pre></div>
+<hr>
+<h2 id="7-notifications"><span class="secnum">7</span>Notifications</h2>
+<p>Today the API is <strong>poll-based</strong>. Outbound webhooks are on the roadmap (§12).</p>
+<p>Build your polling loop so it can be replaced by webhooks without restructuring: put event handling behind a function that takes an event, and have the poller call it. When webhooks arrive, you swap the source and keep the handler.</p>
+<p><strong>Recommended polling</strong></p>
+<div class="tablewrap"><table><thead><tr><th>What</th><th>Endpoint</th><th>Interval</th></tr></thead><tbody><tr><td>Replies</td><td><code>POST /api/v1/interactions</code></td><td>5 minutes</td></tr><tr><td>Campaign progress</td><td><code>GET /api/v1/campaigns</code></td><td>15 minutes while active</td></tr><tr><td>Mailbox health</td><td><code>GET /api/v1/senders</code></td><td>15 minutes</td></tr></tbody></table></div>
+<p><strong>Use overlapping windows and de-duplicate on ID.</strong> A query for exactly the last five minutes can drop an event that lands on the boundary. Query the last fifteen, and discard IDs you have already processed:</p>
+<div class="codewrap"><span class="codelabel">SQL</span><pre class="code"><code><span class="b">INSERT</span> <span class="b">INTO</span> processed_interactions (interaction_id, processed_at)
+<span class="b">VALUES</span> ($1, NOW())
+<span class="b">ON</span> <span class="b">CONFLICT</span> (interaction_id) <span class="b">DO</span> <span class="b">NOTHING</span>;
+<span class="c">-- proceed only <span class="b">if</span> a row was inserted</span></code></pre></div>
+<p><strong>Poll mailbox health even though it feels redundant.</strong> A mailbox whose authorisation lapses stops sending <em>and</em> stops receiving replies, so a silent failure looks exactly like a quiet week. See §8.4.</p>
+<hr>
+<h2 id="8-connecting-a-mailbox"><span class="secnum">8</span>Connecting a mailbox</h2>
+<h3 id="8-1-why-this-needs-a-browser">8.1 Why this needs a browser</h3>
+<p>Outbound email is sent from a mailbox your user authorises. That authorisation is an interactive consent flow — a redirect to the mail provider, a human granting access, and a redirect back. A server-to-server integration cannot complete it alone.</p>
+<p>We handle this with a <strong>hosted connect flow</strong>: you request a connect URL, redirect your user to it, and we manage the entire exchange. You never handle provider credentials, implement the consent flow, or store tokens.</p>
+<h3 id="8-2-the-flow">8.2 The flow</h3>
+<div class="codewrap"><pre class="code"><code>Your UI            Your backend         Our API            Mail provider
+   │                    │                   │                    │
+   │ "Connect mailbox"  │                   │                    │
+   ├───────────────────▶│                   │                    │
+   │                    │ create session    │                    │
+   │                    ├──────────────────▶│                    │
+   │                    │   connect_url     │                    │
+   │                    │◀──────────────────┤                    │
+   │  redirect to it    │                   │                    │
+   │◀───────────────────┤                   │                    │
+   │                                        │                    │
+   │  consent screen                        │                    │
+   ├───────────────────────────────────────▶│───────────────────▶│
+   │  user grants access                    │◀───────────────────┤
+   │                                        │                    │
+   │  redirect to your redirect_uri         │                    │
+   │◀───────────────────────────────────────┤                    │</code></pre></div>
+<h4 id="post-api-v1-senders-connect-sessions" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/senders/connect-sessions</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:senders</code></td></tr><tr><td><strong>Typical latency</strong></td><td>90 ms</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Notes</th></tr></thead><tbody><tr><td><code>redirect_uri</code></td><td>string</td><td><strong>Yes</strong></td><td>HTTPS. <strong>Must be pre-registered with us.</strong></td></tr><tr><td><code>state</code></td><td>string</td><td>No</td><td>Opaque value, returned to you verbatim</td></tr><tr><td><code>email_hint</code></td><td>string</td><td>No</td><td>Pre-fills the provider's form</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"redirect_uri"</span>: <span class="s">"https://app.northwindpr.example.com/settings/mailbox/callback"</span>,
+  <span class="k">"state"</span>: <span class="s">"usr_44812:sess_a91f7c:csrf_8e2b41d9"</span>,
+  <span class="k">"email_hint"</span>: <span class="s">"press@northwindrobotics.com"</span>
+}</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"connect_session_id"</span>: <span class="n">4412</span>,
+    <span class="k">"connect_url"</span>: <span class="s">"https://{host}/connect/s/4412?t=v4Kx2Qm9pLzR7nW3"</span>,
+    <span class="k">"expires_at"</span>: <span class="s">"2026-08-18T10:00:00Z"</span>
+  }
+}</code></pre></div>
+<p><strong><code>connect_url</code> is single-use and expires in 15 minutes.</strong> Redirect immediately — do not email it, store it, or expose it as a shared link.</p>
+<p><strong><code>redirect_uri</code> must be pre-registered.</strong> Send us the exact URIs during onboarding. Unregistered values are rejected: an unvalidated redirect target would be an account-takeover vector.</p>
+<p><strong>Use <code>state</code> as your CSRF token.</strong> Generate a value per attempt, tie it to the user's session, store it server-side, and verify it on callback. Do not put secrets in it — it travels through the browser.</p>
+<h3 id="8-3-the-callback-and-confirmation">8.3 The callback and confirmation</h3>
+<p>On success:</p>
+<div class="codewrap"><pre class="code"><code>https://app.northwindpr.example.com/settings/mailbox/callback
+  ?status=connected
+  &amp;sender_id=2201
+  &amp;state=usr_44812%3Asess_a91f7c%3Acsrf_8e2b41d9</code></pre></div>
+<p>On failure, <code>status=failed</code> with an <code>error</code> parameter.</p>
+<aside class="note"><p><strong>Verify <code>state</code>, then confirm with the API before enabling sending.</strong> The callback arrives through the user's browser and is not trustworthy on its own. Treat it as a UX signal; treat <code>GET /api/v1/senders</code> as the source of truth.</p></aside>
+<h4 id="get-api-v1-senders" class="endpoint"><span class="method m-get">GET</span><code class="path">/api/v1/senders</code></h4>
+<div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:senders</code></td></tr><tr><td><strong>Typical latency</strong></td><td>80 ms</td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"senders"</span>: [
+      {
+        <span class="k">"sender_id"</span>: <span class="n">2201</span>,
+        <span class="k">"email_address"</span>: <span class="s">"press@northwindrobotics.com"</span>,
+        <span class="k">"display_name"</span>: <span class="s">"Priya Raghunathan"</span>,
+        <span class="k">"state"</span>: <span class="s">"RUNNING"</span>,
+        <span class="k">"state_label"</span>: <span class="s">"Connected"</span>,
+        <span class="k">"is_primary"</span>: <span class="b">true</span>,
+        <span class="k">"can_send"</span>: <span class="b">true</span>,
+        <span class="k">"last_refreshed_at"</span>: <span class="s">"2026-08-19T06:00:00Z"</span>
+      }
+    ]
+  }
+}</code></pre></div>
+<div class="tablewrap"><table><thead><tr><th><code>state</code></th><th><code>can_send</code></th><th>Meaning</th></tr></thead><tbody><tr><td><code>RUNNING</code></td><td><code>true</code></td><td>Healthy</td></tr><tr><td><code>PARTIAL</code></td><td><code>true</code></td><td>Connected; initial synchronisation still completing. Can send.</td></tr><tr><td><code>STOPPED</code></td><td><code>false</code></td><td>Paused</td></tr><tr><td><code>INVALID</code></td><td><code>false</code></td><td>Authorisation no longer valid. User must reconnect.</td></tr></tbody></table></div>
+<p><strong>Gate your send UI on <code>can_send</code>, not on <code>state</code>.</strong> It is the single field that answers "can this mailbox send right now", and it stays correct as states are added.</p>
+<h3 id="8-4-disconnection-and-lapsed-authorisation">8.4 Disconnection and lapsed authorisation</h3>
+<p><code>POST /api/v1/senders/{sender_id}/disconnect</code> (scope <code>write:senders</code>) revokes access and stops sending.</p>
+<p><strong>When a mailbox becomes <code>INVALID</code>:</strong></p>
+<div class="tablewrap"><table><thead><tr><th></th><th>Behaviour</th></tr></thead><tbody><tr><td>Already-sent email</td><td>Unaffected</td></tr><tr><td>Pending sends</td><td>Fail</td></tr><tr><td>Campaigns</td><td>Remain <code>ACTIVE</code> and continue attempting sends</td></tr><tr><td><strong>Inbound replies</strong></td><td><strong>Stop arriving</strong></td></tr></tbody></table></div>
+<aside class="note"><p><strong>This is the most important operational warning in this document.</strong> A lapsed mailbox stops replies from reaching you, and campaigns keep running against it. Nothing about it looks like an error from inside your product — it looks like journalists went quiet.</p><p><strong>Poll <code>GET /api/v1/senders</code> every 15 minutes.</strong> On any sender that is not <code>RUNNING</code> or <code>PARTIAL</code>, alert your user, pause affected campaigns, and prompt them to reconnect through a new connect session. Reconnection restores both sending and reply delivery.</p></aside>
+<hr>
+<h2 id="9-journalist-data-sourcing-and-verification"><span class="secnum">9</span>Journalist data: sourcing and verification</h2>
+<h3 id="9-1-what-the-dataset-is">9.1 What the dataset is</h3>
+<p>Journalist data is maintained continuously rather than purchased as a static list. This section describes how it is built and kept current, so you can assess its quality and explain it to your users.</p>
+<h3 id="9-2-where-the-data-comes-from">9.2 Where the data comes from</h3>
+<p><strong>Published bylines</strong> are the primary source. Published articles are ingested continuously and attributed to their authors, so a journalist's record is grounded in work they actually published — and reflects what they cover now, not a role captured once. This is why <code>include_articles</code> returns real, dated, linkable work.</p>
+<p><strong>Public outlet and syndication data</strong> — mastheads, staff directories, editorial contact pages — establishes affiliation, role and desk, and is the main signal for detecting job changes.</p>
+<p><strong>Licensed and permissioned datasets</strong> from providers operating under their own compliance frameworks supplement and cross-check the above. They are never the sole basis for a contactable record.</p>
+<p><strong>Direct journalist updates</strong> take precedence over every other source. Journalists can correct their record, update their beats, or opt out entirely. A journalist who says they no longer cover a subject is believed immediately, over any inference from their published work.</p>
+<h3 id="9-3-normalisation-and-de-duplication">9.3 Normalisation and de-duplication</h3>
+<p>Sources disagree constantly — the same person may appear as "Adaeze Nwankwo", "A. Nwankwo" and "Adaeze O. Nwankwo" across three outlets.</p>
+<p><strong>Normalisation</strong> standardises names, titles, outlets and locations. Name variants are tracked as aliases, so a byline under a former name still attributes correctly. Outlets resolve to canonical entities, so a publication and its regional editions are recognised as related.</p>
+<p><strong>De-duplication</strong> consolidates records for the same person, preserving the union of verified information. Ambiguous cases go to human review rather than being merged automatically, because an incorrect merge creates a record that misrepresents two real people.</p>
+<h3 id="9-4-verification-and-freshness">9.4 Verification and freshness</h3>
+<p>Verification independently confirms three things: the person is still working as a journalist, the affiliation is current, and the contact route is deliverable. Deliverability is established without sending unsolicited mail.</p>
+<p>Freshness is tracked <strong>per field</strong>, not per record — employment, title, location, bio and beat tags each carry their own last-updated state, so a stale job title does not make an otherwise-current record look fresh.</p>
+<p>Verification cadence follows the likelihood of change: high-activity journalists, and those at outlets undergoing restructuring, are re-verified sooner.</p>
+<p><strong><code>last_verified_at</code></strong> appears on every journalist object:</p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"journalist_id"</span>: <span class="n">88412</span>, <span class="k">"name"</span>: <span class="s">"Adaeze Nwankwo"</span>, <span class="k">"last_verified_at"</span>: <span class="s">"2026-08-11T00:00:00Z"</span>, <span class="k">"is_contactable"</span>: <span class="b">true</span> }</code></pre></div>
+<p>Read it as: <em>as of this date, we confirmed this journalist is working, at this outlet, and reachable.</em> It is not the last time any field changed, nor the last time they published. Date precision reflects that verification is a rolling process rather than an instant.</p>
+<div class="tablewrap"><table><thead><tr><th>Age</th><th>Interpretation</th></tr></thead><tbody><tr><td>Under 30 days</td><td>Fresh</td></tr><tr><td>30–90 days</td><td>Current</td></tr><tr><td>90–180 days</td><td>Aging — consider flagging for high-stakes outreach</td></tr><tr><td>Over 180 days</td><td>Should not appear as contactable. Tell us if you see one.</td></tr></tbody></table></div>
+<h3 id="9-5-retiring-records">9.5 Retiring records</h3>
+<p>Records leave circulation through several routes, all reflected in <code>is_contactable</code>:</p>
+<p><strong>Delivery failure.</strong> A permanent failure marks a route unusable immediately and platform-wide, so a failure for one customer protects every other customer from the same dead address.</p>
+<p><strong>Failed verification.</strong> A record that cannot be re-verified is withheld, then retired. This is reversible — a journalist resurfacing at a new outlet is reinstated after fresh verification.</p>
+<p><strong>Career change.</strong> Leaving the profession retires the record. Moving outlets is an update, not a retirement.</p>
+<p><strong>Opt-out.</strong> A journalist requesting removal is retired immediately and permanently across the platform, and no customer can override it.</p>
+<p><strong>Outlet closure</strong> triggers accelerated re-verification rather than retirement, since most journalists move elsewhere.</p>
+<p>Retired journalists remain retrievable by ID with <code>is_contactable: false</code>, so your historical campaign records stay renderable. Past campaigns never break; those journalists simply cannot be targeted again.</p>
+<h3 id="9-6-what-we-do-not-disclose">9.6 What we do not disclose</h3>
+<p>The sections above describe how the dataset is <strong>sourced, normalised, verified and retired</strong>. They deliberately do not describe how journalists are <strong>selected or ordered</strong> for a brand or a pitch.</p>
+<p>No endpoint returns a relevance score, rank value, feature weight or match explanation. Boolean signals like <code>is_high_response_rate</code> replace the underlying figures.</p>
+<p>This is intentional, for two reasons that also serve you. The selection methodology is the core of the product. And a published relevance model invites tuning inputs to inflate match counts — which degrades result quality for every customer, and means more poorly-targeted pitches reaching journalists, which is the fastest way to erode the goodwill the whole dataset depends on.</p>
+<p><strong>What you can rely on:</strong> ordering is meaningful, stable within a query, and derived from the profile and pitch you supply. Richer input produces better ordering — that is the lever available to you, and §6.2 explains how to use it.</p>
+<hr>
+<h2 id="10-privacy-and-data-handling"><span class="secnum">10</span>Privacy and data handling</h2>
+<h3 id="10-1-what-we-do-not-return">10.1 What we do not return</h3>
+<div class="tablewrap"><table><thead><tr><th>Category</th><th>Not exposed</th></tr></thead><tbody><tr><td>Journalist contact details</td><td>Email addresses, phone numbers</td></tr><tr><td>Ranking internals</td><td>Scores, ranks, weights, match explanations</td></tr><tr><td>Other customers' activity</td><td>Any other account's outreach, engagement or results</td></tr><tr><td>Data provenance</td><td>Provider names, source-system record identifiers</td></tr><tr><td>Generation internals</td><td>Prompts, model details, unprocessed output</td></tr><tr><td>Credentials</td><td>Mailbox authorisation tokens, key material</td></tr><tr><td>Diagnostics</td><td>Stack traces, internal system detail in errors</td></tr></tbody></table></div>
+<h3 id="10-2-journalist-personal-data">10.2 Journalist personal data</h3>
+<p>Journalist data is personal data. We act as controller for it, and handle it accordingly.</p>
+<p><strong>Returned:</strong> name, current outlet, job title, beats and themes, location, public professional bio, published bylines, public professional social handles, your own engagement history, contactability and verification freshness. All of it either published professionally by the journalist or provided by them.</p>
+<p><strong>Never returned, under any scope:</strong> email address, phone number, and any other customer's engagement history.</p>
+<p><strong>Why addresses are withheld</strong> — this is the constraint most likely to shape your UI:</p>
+<ol>
+<li><strong>It minimises how widely personal data is copied.</strong> Every additional copy is another exposure surface and another set of obligations.</li>
+<li><strong>It makes opt-outs enforceable.</strong> Because sending happens through the platform, an unsubscribe is honoured universally and immediately. Exported addresses could not be.</li>
+<li><strong>It preserves journalist trust.</strong> Journalists maintain their own records because their contact details are not redistributed. That cooperation is what keeps the data accurate — and accurate data is what makes your outreach land.</li>
+<li><strong>It reduces your compliance burden.</strong> Journalist contact data never enters your database, logs, backups, or subject-access-request scope.</li>
+</ol>
+<p><strong>What this means practically.</strong> You cannot display an address, offer "copy email", or send through your own infrastructure. You can display full profiles, let users select journalists, edit copy, and send through §6.7 or §6.8 — which covers every workflow the product supports.</p>
+<h3 id="10-3-generated-content">10.3 Generated content</h3>
+<p>Pitches, subject lines, personalisation lines, follow-ups and analysis text are generated, then post-processed and validated against a schema before return. Fields marked <strong>Display copy</strong> are safe to render.</p>
+<p>Apply standard output encoding when rendering, as you would for any content that did not originate in your own code.</p>
+<h3 id="10-4-your-data">10.4 Your data</h3>
+<p>Data you submit — company profile, pitch copy, campaign configuration, wire releases — is processed on your behalf to deliver the service. We act as processor for it. Terms are in your data processing agreement; contact your account manager for a copy.</p>
+<h3 id="10-5-unsubscribes-and-suppression">10.5 Unsubscribes and suppression</h3>
+<p><strong>You own your suppression policy.</strong> You decide which journalists your brand does not contact, and filter your target lists accordingly.</p>
+<p><strong>Three conditions block sending permanently, regardless of your list:</strong></p>
+<div class="tablewrap"><table><thead><tr><th>Condition</th><th>Why it cannot be overridden</th></tr></thead><tbody><tr><td><strong>Unsubscribe</strong></td><td>A legal requirement and a withdrawal of consent.</td></tr><tr><td><strong>Permanent delivery failure</strong></td><td>The address does not exist. Continued sending damages the sending domain's reputation, degrading deliverability for your campaigns and everyone else's.</td></tr><tr><td><strong>Spam complaint</strong></td><td>The strongest negative deliverability signal there is.</td></tr></tbody></table></div>
+<p>Each of these is unrecoverable if ignored: a journalist who receives mail after opting out does not un-receive it, and a blocked sending domain takes weeks to recover. Everything above that floor is your decision.</p>
+<p>Affected journalists show <code>is_contactable: false</code>.</p>
+<aside class="note"><p><strong>Handle <code>UNSUBSCRIBED</code> interactions immediately.</strong> A journalist may ask to be removed in reply text rather than through the unsubscribe link. When you see that interaction type, record the opt-out in your own system on the same pass — do not defer it to a later sync.</p></aside>
+<p>An unsubscribe footer is included in outbound campaign email as required by anti-spam law and by major mailbox providers. It is not removable.</p>
+<h3 id="10-6-retention-and-deletion">10.6 Retention and deletion</h3>
+<div class="tablewrap"><table><thead><tr><th>Data</th><th>Retention</th></tr></thead><tbody><tr><td>Company profile and analysis</td><td>Life of the account</td></tr><tr><td>Campaigns and email</td><td>24 months</td></tr><tr><td>Wire releases</td><td>Life of the account</td></tr><tr><td>Suppression records</td><td>Indefinite</td></tr></tbody></table></div>
+<p>Reply history informs future outreach quality, which is why email retention is measured in months rather than weeks. If your obligations require shorter retention, tell us during onboarding.</p>
+<p>Account deletion is handled by your account manager and completes within 30 days across primary storage and backups. <strong>Suppression records survive deletion</strong> — removing an account must not restore the ability to contact someone who opted out.</p>
+<hr>
+<h2 id="11-integration-recipes"><span class="secnum">11</span>Integration recipes</h2>
+<h3 id="11-1-set-up-a-brand-and-get-journalist-matches">11.1 Set up a brand and get journalist matches</h3>
+<p><strong>1. Confirm your key.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/me</span>
+<span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f</code></pre></div>
+<p>Record <code>account_id</code> against your own brand record.</p>
+<p><strong>2. Read the profile.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/account/profile</span></code></pre></div>
+<p><strong>3. Enrich it.</strong> The highest-leverage call in your integration.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">PATCH</span> <span class="u">/api/v1/account/profile</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"company_blurb"</span>: <span class="s">"Northwind Robotics builds autonomous mobile robots for mid-market distribution centres, including a cold-chain line rated to -20C."</span>,
+  <span class="k">"areas_of_expertise"</span>: [<span class="s">"Warehouse automation"</span>, <span class="s">"Cold-chain logistics"</span>, <span class="s">"Autonomous mobile robots"</span>],
+  <span class="k">"themes"</span>: [<span class="s">"Supply chain"</span>, <span class="s">"Robotics"</span>, <span class="s">"Labour economics"</span>],
+  <span class="k">"topics"</span>: [<span class="s">"warehouse automation"</span>, <span class="s">"cold chain"</span>, <span class="s">"fulfilment"</span>],
+  <span class="k">"keywords"</span>: [<span class="s">"autonomous mobile robots"</span>, <span class="s">"refrigerated warehouse"</span>, <span class="s">"3PL automation"</span>],
+  <span class="k">"geo_focus"</span>: [<span class="s">"NATIONAL"</span>, <span class="s">"REGIONAL"</span>]
+}</code></pre></div>
+<p><strong>4. Add a spokesperson</strong> if none exists.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/account/spokespeople</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"name"</span>: <span class="s">"Dana Reyes"</span>, <span class="k">"title"</span>: <span class="s">"Chief Executive Officer"</span>, <span class="k">"is_primary"</span>: <span class="b">true</span> }</code></pre></div>
+<p><strong>5. Check for an analysis.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/account/analysis</span></code></pre></div>
+<p><code>NOT_STARTED</code> means none has run — discovery still works from the profile alone. If <code>generated_at</code> predates the profile's <code>updated_at</code>, the analysis is stale; surface that.</p>
+<p><strong>6. Get matches.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/top</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
+<p>Render in the order returned. <strong>Exclude <code>is_contactable: false</code>.</strong></p>
+<hr>
+<h3 id="11-2-press-release-to-launched-campaign">11.2 Press release to launched campaign</h3>
+<p>Wire distribution and direct outreach are separate activities. This recipe does both.</p>
+<p><strong>1. Submit the release.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/wire-releases</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"headline"</span>: <span class="s">"Northwind Robotics Raises $42M Series B to Expand Cold-Chain Automation"</span>,
+  <span class="k">"content"</span>: <span class="s">"**PORTLAND, Ore.** — Northwind Robotics today announced a $42 million Series B financing led by Cascadia Ventures..."</span>,
+  <span class="k">"categories"</span>: [<span class="s">"Business &amp;amp; Economy"</span>, <span class="s">"Technology"</span>],
+  <span class="k">"contact_info"</span>: { <span class="k">"name"</span>: <span class="s">"Priya Raghunathan"</span>, <span class="k">"email"</span>: <span class="s">"press@northwindrobotics.com"</span> },
+  <span class="k">"launch"</span>: { <span class="k">"date"</span>: <span class="s">"2026-08-20"</span>, <span class="k">"time"</span>: <span class="s">"09:00"</span>, <span class="k">"timezone"</span>: <span class="s">"America/New_York"</span> }
+}</code></pre></div>
+<p><strong>2. Generate a pitch</strong> for the outreach campaign. Queue this — it takes up to 30 seconds.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/pitches/generate</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"comment"</span>: <span class="s">"We closed a $42M Series B for our cold-chain robotics line. The real story is that refrigerated warehouses have the worst labour shortage in logistics and the least automation."</span>,
+  <span class="k">"spokesperson_id"</span>: <span class="n">771</span>,
+  <span class="k">"pitch_length"</span>: <span class="s">"Standard"</span>
+}</code></pre></div>
+<p><strong>3. Generate a subject line.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/pitches/subject-line</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span> }</code></pre></div>
+<p><strong>4. Find journalists for this pitch</strong> — tighter than brand-level matching.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/relevant</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>, <span class="k">"page_size"</span>: <span class="n">30</span>, <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
+<p>Keep only <code>is_contactable: true</code>.</p>
+<p><strong>5. Personalise in small batches</strong> of 10–20.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/pitches/personalize</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses..."</span>, <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>, <span class="n">90233</span>, <span class="n">91055</span>, <span class="n">91820</span>, <span class="n">92140</span>] }</code></pre></div>
+<p><strong>6. Confirm a mailbox can send.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/senders</span></code></pre></div>
+<p><strong>7. Create a draft</strong> and present it for review.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/campaigns/drafts</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"name"</span>: <span class="s">"Series B — cold-chain angle"</span>,
+  <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>,
+  <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span>,
+  <span class="k">"journalists"</span>: [
+    { <span class="k">"journalist_id"</span>: <span class="n">88412</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your piece last week on cold storage staffing..."</span> },
+    { <span class="k">"journalist_id"</span>: <span class="n">90233</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your Q2 analysis noted mid-market robotics..."</span> }
+  ],
+  <span class="k">"email_greeting"</span>: <span class="s">"Hi"</span>,
+  <span class="k">"email_sign_off"</span>: <span class="s">"Best,"</span>
+}</code></pre></div>
+<p><strong>8. After human approval, launch.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/campaigns</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"name"</span>: <span class="s">"Series B — cold-chain angle"</span>,
+  <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>,
+  <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span>,
+  <span class="k">"follow_up"</span>: <span class="s">"Following up briefly — the cold-chain deployment data is ready if useful."</span>,
+  <span class="k">"follow_up_delay"</span>: <span class="n">4</span>,
+  <span class="k">"journalists"</span>: [
+    { <span class="k">"journalist_id"</span>: <span class="n">88412</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your piece last week on cold storage staffing..."</span> },
+    { <span class="k">"journalist_id"</span>: <span class="n">90233</span>, <span class="k">"personalization_line"</span>: <span class="s">"Your Q2 analysis noted mid-market robotics..."</span> }
+  ],
+  <span class="k">"email_action"</span>: <span class="s">"send"</span>,
+  <span class="k">"use_ai_personalization"</span>: <span class="b">true</span>,
+  <span class="k">"pitch_type"</span>: <span class="s">"announcement"</span>
+}</code></pre></div>
+<p><code>email_action: "send"</code> dispatches real email. On timeout, check <code>GET /api/v1/campaigns</code> before retrying.</p>
+<p><strong>9. Reconcile recipients.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/campaigns/33914/journalists</span></code></pre></div>
+<p>Show your users the resolved count, which may be lower than requested.</p>
+<hr>
+<h3 id="11-3-handle-a-reply">11.3 Handle a reply</h3>
+<p><strong>1. Poll interactions</strong> every five minutes with an overlapping window.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/interactions</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"date_range"</span>: { <span class="k">"start_date"</span>: <span class="s">"2026-08-19"</span>, <span class="k">"end_date"</span>: <span class="s">"2026-08-19"</span> } }</code></pre></div>
+<p><strong>2. De-duplicate on <code>interaction_id</code></strong> before processing.</p>
+<p><strong>3. Route on <code>type</code></strong> using the table in §6.8. Include a default branch for unrecognised values.</p>
+<p><strong>4. Act on <code>UNSUBSCRIBED</code> immediately</strong> — record the opt-out in your own system on this pass.</p>
+<p><strong>5. Fetch thread context</strong> where a reply needs it.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/emails/sent</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"journalist_id"</span>: <span class="n">88412</span> }</code></pre></div>
+<p><strong>6. Reply.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/emails/884120/reply</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"interaction_id"</span>: <span class="n">55120</span>,
+  <span class="k">"email_body"</span>: <span class="s">"Adaeze — Thursday 9am Pacific works for Dana. I'll send the deployment data with turnover figures this afternoon.\n\nPriya"</span>
+}</code></pre></div>
+<p><strong>7. Check mailbox health in the same loop.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/senders</span></code></pre></div>
+<p>Alert on anything not <code>RUNNING</code> or <code>PARTIAL</code> — a lapsed mailbox is why replies stop arriving (§8.4).</p>
+<hr>
+<h3 id="11-4-newsjacking-outreach-to-the-author-of-a-story">11.4 Newsjacking: outreach to the author of a story</h3>
+<p><strong>1. Get recent stories.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/stories/trending</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"lookback_hours"</span>: <span class="n">72</span> }</code></pre></div>
+<p><strong>2. Resolve the byline.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/articles/lookup</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"article_ids"</span>: [<span class="n">991204</span>] }</code></pre></div>
+<p><strong>3. Check contactability and prior history.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/lookup</span>
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>], <span class="k">"include_interactions"</span>: <span class="b">true</span> }</code></pre></div>
+<p><code>include_interactions</code> shows existing conversations, so you do not pitch someone mid-thread.</p>
+<p><strong>4. Generate the email.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/outreach/generate</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
+  <span class="k">"email_type"</span>: <span class="s">"ARTICLE_FOLLOW_UP"</span>,
+  <span class="k">"article_ids"</span>: [<span class="n">991204</span>],
+  <span class="k">"data_point"</span>: <span class="s">"Eleven of our 34 deployed fleets run in refrigerated facilities."</span>
+}</code></pre></div>
+<p><strong>5. After review, send.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/emails</span>
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
+  <span class="k">"subject_line"</span>: <span class="s">"Your cold storage staffing piece — operator data available"</span>,
+  <span class="k">"email_body"</span>: <span class="s">"Hi Adaeze,\n\nYour piece on widening staffing gaps in cold storage matched what we see operationally...\n\nBest,\nPriya"</span>
+}</code></pre></div>
+<p>This sends immediately — there is no draft state on this endpoint.</p>
+<hr>
+<h2 id="12-availability-and-roadmap"><span class="secnum">12</span>Availability and roadmap</h2>
+<p>Everything documented in §6 is available in <code>v1</code> unless listed below.</p>
+<h3 id="available-now">Available now</h3>
+<ul>
+<li>Company profile, spokespeople, competitors — read and write</li>
+<li>Brand analysis and PR plan — read</li>
+<li>Journalist discovery: top, relevant, search, lookup</li>
+<li>Story, article, publication and podcast discovery</li>
+<li>Lists — save, retrieve, search</li>
+<li>Pitch, subject line, personalisation and follow-up generation</li>
+<li>Campaign drafts, launch, pause, delete, reporting</li>
+<li>1:1 outreach generation and sending, replies</li>
+<li>Wire release submission</li>
+<li>Mailbox connection, status and disconnection</li>
+</ul>
+<h3 id="planned">Planned</h3>
+<p>Listed with what changes for you. Dates are shared through your account manager rather than committed here.</p>
+<div class="tablewrap"><table><thead><tr><th>Capability</th><th>What it gives you</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Outbound webhooks</strong></td><td>Replies and email events pushed to your endpoint instead of polled</td><td>Signed, with retries and delivery logs. See §7 for how to structure code now so this is a swap, not a rewrite.</td></tr><tr><td><strong>API-initiated brand analysis</strong></td><td>Start an analysis from your product and poll a job resource</td><td>Removes the current dependency on the platform interface (§5.3)</td></tr><tr><td><strong>Self-serve key management</strong></td><td>Create, list, rotate and revoke keys programmatically</td><td>Rotation with an overlap window, so credentials roll without downtime</td></tr><tr><td><strong>Test mode</strong></td><td>Exercise the full flow, including sends, against test data with no real email</td><td>Until this ships, use <code>email_action: "draft"</code> — see the guidance below</td></tr><tr><td><strong>Idempotency keys</strong></td><td>Safe retries on campaign launch and send</td><td>Removes the check-before-retry step in §6.7</td></tr><tr><td><strong>Scheduled campaign launch</strong></td><td>Set a future send time via the API</td><td>Currently scheduled sends are configured in the platform interface</td></tr><tr><td><strong>Suppression list API</strong></td><td>Read and write the suppression list directly</td><td>Today, <code>is_contactable</code> reflects platform-side suppression</td></tr><tr><td><strong>Delivery and complaint events</strong></td><td><code>delivered</code> and <code>complaint</code> alongside sent, opened, clicked, bounced, replied</td><td>Not currently reported; do not build logic expecting them</td></tr><tr><td><strong>Bulk endpoints</strong></td><td>Batch operations for high-volume onboarding</td><td>Tell us your volumes so we can size this</td></tr><tr><td><strong>Self-serve account provisioning</strong></td><td>Create brand accounts programmatically</td><td>For partners managing many client brands</td></tr></tbody></table></div>
+<h3 id="testing-safely-before-test-mode-exists">Testing safely before test mode exists</h3>
+<p>Until test mode ships, this is how to build and test without risk:</p>
+<ol>
+<li><strong>Keep <code>email_action</code> at <code>draft</code> everywhere.</strong> Every campaign endpoint works fully; nothing is delivered. This exercises your entire flow except dispatch.</li>
+<li><strong>Do not call <code>POST /api/v1/emails</code> during development</strong> — it sends immediately with no draft option. Stub it in your test environment.</li>
+<li><strong>Connect a mailbox you control</strong> and add your own address as a journalist target only via a test account we provision — ask your account manager rather than targeting real journalists.</li>
+<li><strong>Gate the send path behind a feature flag</strong> so enabling it is a deliberate, reviewable change.</li>
+</ol>
+<p>Point 4 is worth doing regardless. It is also what makes adopting test mode trivial when it arrives.</p>
+<hr>
+<h2 id="13-support"><span class="secnum">13</span>Support</h2>
+<p><strong>When reporting a problem, include the <code>request_id</code></strong> from the response. Every response carries one, and it lets us find the exact request in seconds rather than asking you to reproduce it.</p>
+<div class="tablewrap"><table><thead><tr><th>Need</th><th>Contact</th></tr></thead><tbody><tr><td>Integration questions, documentation gaps</td><td>Your account manager</td></tr><tr><td>Suspected data error in a journalist record</td><td>Your account manager, with the <code>journalist_id</code></td></tr><tr><td>Key rotation or a suspected key exposure</td><td>Your account manager, <strong>immediately</strong></td></tr><tr><td>Additional brand accounts</td><td>Your account manager</td></tr><tr><td>Registering or changing a <code>redirect_uri</code></td><td>Your account manager</td></tr></tbody></table></div>
+<p>Tell us if anything in this document is unclear, incomplete, or contradicted by what the API actually does. Documentation defects are treated as defects.</p>
+<hr>
+<h2 id="changelog">Changelog</h2>
+<div class="tablewrap"><table><thead><tr><th>Date</th><th>Version</th><th>Change</th></tr></thead><tbody><tr><td>18 August 2026</td><td><code>v1</code></td><td>First published specification.</td></tr></tbody></table></div></main>
+</div>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('themebtn');
+  function cur(){
+    var s=root.getAttribute('data-theme');
+    if(s) return s;
+    return window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+  }
+  function label(){ btn.textContent = cur()==='dark' ? 'Light theme' : 'Dark theme'; }
+  btn.addEventListener('click',function(){
+    root.setAttribute('data-theme', cur()==='dark'?'light':'dark'); label();
+  });
+  label();
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',label);
+
+  var links=[].slice.call(document.querySelectorAll('.rail nav a'));
+  var map={};
+  links.forEach(function(a){
+    var el=document.getElementById(a.getAttribute('href').slice(1));
+    if(el) map[a.getAttribute('href').slice(1)]=a;
+  });
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        links.forEach(function(l){l.classList.remove('on')});
+        var a=map[en.target.id]; if(a) a.classList.add('on');
+      }
+    });
+  },{rootMargin:'0px 0px -80% 0px', threshold:0});
+  Object.keys(map).forEach(function(id){ obs.observe(document.getElementById(id)); });
+})();
+</script>
+
+</body>
+</html>
