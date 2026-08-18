@@ -255,25 +255,28 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-of
 <hr>
 <h2 id="1-core-concepts"><span class="secnum">1</span>Core concepts</h2>
 <h3 id="1-1-the-object-model">1.1 The object model</h3>
-<div class="codewrap"><pre class="code"><code>Account ──────────── your organisation and its brand profile
+<div class="codewrap"><pre class="code"><code>Partner ──────────── you: the integrating organisation. Owns many accounts.
+  │                 API keys are issued at this level.
   │
-  ├── Company profile     name, website, positioning, themes, keywords
-  ├── Spokesperson        a named person available for quotes and interviews
-  ├── Competitor          a tracked competitor
-  ├── Analysis            brand analysis: positioning, messaging, PR plan
-  ├── Sender              a connected sending mailbox
-  ├── Campaign draft      a prepared, not-yet-launched campaign
-  ├── Campaign            a launched outreach effort
-  ├── Email               an individual message, outbound or inbound
-  ├── Interaction         a classified reply outcome
-  └── Wire release        a press release for distribution
+  └── Account ────── one brand. Its profile, campaigns, and outreach.
+        │
+        ├── Company profile   name, website, positioning, themes, keywords
+        ├── Spokesperson      a named person available for quotes and interviews
+        ├── Competitor        a tracked competitor
+        ├── Analysis          brand analysis: positioning, messaging, PR plan
+        ├── Sender            a connected sending mailbox
+        ├── Campaign draft    a prepared, not-yet-launched campaign
+        ├── Campaign          a launched outreach effort
+        ├── Email             an individual message, outbound or inbound
+        ├── Interaction       a classified reply outcome
+        └── Wire release      a press release for distribution
 
 Journalist ─────────── a media contact. Shared, read-only.
 Publication ────────── an outlet
 Podcast ────────────── a podcast outlet
 Article ────────────── a published story</code></pre></div>
-<p><strong>An account holds one brand profile.</strong> Company name, website, positioning, messaging, themes, spokespeople and the PR plan are all attributes of the account. An API key belongs to exactly one account, and therefore to exactly one brand.</p>
-<p>If you manage several brands — your own products, or client brands as an agency — <strong>each brand needs its own account and its own API key.</strong> Design for this from the start: hold a key per brand and select the right one per request, rather than assuming one credential covers your whole portfolio. See §2.1.</p>
+<p><strong>An account holds one brand profile.</strong> Company name, website, positioning, messaging, themes, spokespeople and the PR plan are all attributes of the account. One account is one brand.</p>
+<p><strong>You are a partner, and one API key covers every account you own.</strong> If you manage a hundred client brands, that is a hundred accounts under your partner — and one credential to store and rotate. You select the brand per request with an <code>account_id</code>, not by swapping keys. See §3.2.</p>
 <h3 id="1-2-how-the-pieces-fit-together">1.2 How the pieces fit together</h3>
 <p>The typical flow, and the order that matters:</p>
 <div class="codewrap"><pre class="code"><code>  company profile
@@ -296,11 +299,12 @@ Article ────────────── a published story</code></pre
 <p><strong>The company profile drives everything downstream.</strong> Journalist relevance and pitch quality both derive from it. A sparse profile produces broad matches and generic copy — this shows up as weak reply rates rather than as errors. §6.2 covers what to populate.</p>
 <p><strong>Pitch generation and campaign creation are separate steps.</strong> No single call produces a finished campaign. You generate copy, review it, then pass it into a campaign. This is deliberate: it puts a human approval point in front of anything that sends email to a journalist.</p>
 <h3 id="1-3-glossary">1.3 Glossary</h3>
-<div class="tablewrap"><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>Account</strong></td><td>Your organisation and its brand profile. The tenant boundary.</td></tr><tr><td><strong>Company profile</strong></td><td>Brand attributes: name, URL, blurb, expertise, themes, topics, keywords, geographic focus.</td></tr><tr><td><strong>Analysis</strong></td><td>Brand analysis output: positioning, core messaging, PR messaging clusters, and a month-by-month PR plan.</td></tr><tr><td><strong>PR plan</strong></td><td>Suggested campaign ideas by month, from the analysis.</td></tr><tr><td><strong>Campaign idea</strong></td><td>One suggested campaign. Not yet a campaign.</td></tr><tr><td><strong>Campaign draft</strong></td><td>A prepared campaign. Nothing is sent until launch.</td></tr><tr><td><strong>Campaign</strong></td><td>A launched outreach effort targeting many journalists.</td></tr><tr><td><strong>Pitch</strong></td><td>The body copy of an outreach email.</td></tr><tr><td><strong>Personalisation line</strong></td><td>A per-journalist opening line prepended to the shared pitch.</td></tr><tr><td><strong>Journalist</strong></td><td>A media contact. Shared across customers, read-only.</td></tr><tr><td><strong>Interaction</strong></td><td>A classified reply outcome — positive, interview scheduled, unsubscribed, and so on.</td></tr><tr><td><strong>Sender</strong></td><td>A connected mailbox that outbound email is sent from.</td></tr><tr><td><strong>Spokesperson</strong></td><td>A named person at your brand available for quotes and interviews.</td></tr><tr><td><strong>Wire release</strong></td><td>A press release submitted for wire distribution.</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Term</th><th>Meaning</th></tr></thead><tbody><tr><td><strong>Partner</strong></td><td>Your organisation. Owns many accounts. API keys are issued at this level.</td></tr><tr><td><strong>Account</strong></td><td>One brand, and the container for its profile, campaigns and outreach. Named per request by <code>account_id</code>.</td></tr><tr><td><strong>Company profile</strong></td><td>Brand attributes: name, URL, blurb, expertise, themes, topics, keywords, geographic focus.</td></tr><tr><td><strong>Analysis</strong></td><td>Brand analysis output: positioning, core messaging, PR messaging clusters, and a month-by-month PR plan.</td></tr><tr><td><strong>PR plan</strong></td><td>Suggested campaign ideas by month, from the analysis.</td></tr><tr><td><strong>Campaign idea</strong></td><td>One suggested campaign. Not yet a campaign.</td></tr><tr><td><strong>Campaign draft</strong></td><td>A prepared campaign. Nothing is sent until launch.</td></tr><tr><td><strong>Campaign</strong></td><td>A launched outreach effort targeting many journalists.</td></tr><tr><td><strong>Pitch</strong></td><td>The body copy of an outreach email.</td></tr><tr><td><strong>Personalisation line</strong></td><td>A per-journalist opening line prepended to the shared pitch.</td></tr><tr><td><strong>Journalist</strong></td><td>A media contact. Shared across customers, read-only.</td></tr><tr><td><strong>Interaction</strong></td><td>A classified reply outcome — positive, interview scheduled, unsubscribed, and so on.</td></tr><tr><td><strong>Sender</strong></td><td>A connected mailbox that outbound email is sent from.</td></tr><tr><td><strong>Spokesperson</strong></td><td>A named person at your brand available for quotes and interviews.</td></tr><tr><td><strong>Wire release</strong></td><td>A press release submitted for wire distribution.</td></tr></tbody></table></div>
 <h3 id="1-4-what-the-api-does-not-do">1.4 What the API does not do</h3>
 <p>Stated up front so you do not design against absent capability.</p>
 <ul>
-<li><strong>No account or brand creation.</strong> Accounts are provisioned by us. See §2.1.</li>
+<li><strong>No account or brand creation.</strong> Accounts are provisioned under your partner by us. See §2.1.</li>
+<li><strong>No per-account scoping of a key.</strong> A key reaches every account under its partner; scopes limit actions, not brands. See §3.3.</li>
 <li><strong>No journalist email addresses.</strong> You target journalists by ID and we deliver. See §10.2.</li>
 <li><strong>No relevance scores or ranking explanations.</strong> Results are ordered; the ordering is not quantified. See §9.6.</li>
 <li><strong>No journalist record editing.</strong> The dataset is shared across all customers.</li>
@@ -309,7 +313,7 @@ Article ────────────── a published story</code></pre
 <hr>
 <h2 id="2-getting-started"><span class="secnum">2</span>Getting started</h2>
 <h3 id="2-1-getting-an-account-and-an-api-key">2.1 Getting an account and an API key</h3>
-<p>Accounts are provisioned by us as part of commercial onboarding, one per brand. You receive an API key for each through a secure channel.</p>
+<p>You are set up once as a <strong>partner</strong>, and receive one API key through a secure channel. Accounts are then provisioned under that partner, one per brand — and your existing key reaches each new account as it is added, with no new credential and no code change.</p>
 <p>There is no public signup endpoint. Account creation involves contract acceptance and billing enrolment, so it is handled by your account manager rather than by an API call.</p>
 <p><strong>If you need many brands</strong>, tell us the expected number and growth rate during onboarding so we can provision in bulk rather than one at a time. See §12 for planned self-serve provisioning.</p>
 <h3 id="2-2-your-first-call">2.2 Your first call</h3>
@@ -318,22 +322,33 @@ Article ────────────── a published story</code></pre
 <span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f</code></pre></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
   <span class="k">"data"</span>: {
-    <span class="k">"account_id"</span>: <span class="n">4821</span>,
-    <span class="k">"account_name"</span>: <span class="s">"Northwind Robotics"</span>
+    <span class="k">"partner_id"</span>: <span class="n">118</span>,
+    <span class="k">"partner_name"</span>: <span class="s">"Northwind PR Group"</span>,
+    <span class="k">"accounts"</span>: [
+      { <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"account_name"</span>: <span class="s">"Northwind Robotics"</span> },
+      { <span class="k">"account_id"</span>: <span class="n">4822</span>, <span class="k">"account_name"</span>: <span class="s">"Cascade Cold Chain"</span> },
+      { <span class="k">"account_id"</span>: <span class="n">4823</span>, <span class="k">"account_name"</span>: <span class="s">"Tallwood Freight"</span> }
+    ],
+    <span class="k">"total"</span>: <span class="n">3</span>,
+    <span class="k">"page"</span>: <span class="n">1</span>,
+    <span class="k">"page_size"</span>: <span class="n">50</span>
   }
 }</code></pre></div>
-<p><strong>This establishes the most important rule in the API: the account is determined by your API key, never by the request body.</strong> You never send an account identifier. Cache <code>account_id</code> for your own logging and correlation, and never accept one as input from your end users.</p>
+<p><code>accounts</code> is paginated per §4.6 — a partner with hundreds of brands pages through them.</p>
+<p><code>GET /me</code> describes your partner and the accounts your key can reach. Call it once at integration start and cache the result — it is how you discover new brands without a deploy.</p>
+<p><strong>Every other endpoint takes an <code>account_id</code> naming the brand you are acting on.</strong> The key authorises <em>which</em> accounts you may address; <code>account_id</code> selects one of them per request. A key can only ever reach accounts under its own partner — anything else returns <code>404</code>, identical to a non-existent account, so a wrong or probed identifier reveals nothing.</p>
+<p><strong>Treat <code>account_id</code> as trusted server-side input, not a user-supplied parameter.</strong> Map your own end users to the accounts they are entitled to and resolve the identifier on your server. Passing it straight through from a browser request would let one of your customers address another's brand.</p>
 <h3 id="2-3-your-first-real-call">2.3 Your first real call</h3>
 <p>Fetch journalists relevant to your brand:</p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/top</span>
 <span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
 <p>If this returns few results or loose matches, the company profile needs enriching before anything else — start at §6.2.</p>
 <h3 id="2-4-integration-checklist">2.4 Integration checklist</h3>
 <p>Work through these in order. Each is explained in the section referenced.</p>
-<div class="tablewrap"><table><thead><tr><th></th><th>Step</th><th>Section</th></tr></thead><tbody><tr><td>1</td><td>Confirm your key with <code>GET /me</code></td><td>§2.2</td></tr><tr><td>2</td><td>Populate the company profile, including at least one spokesperson</td><td>§6.2</td></tr><tr><td>3</td><td>Connect a sending mailbox</td><td>§8</td></tr><tr><td>4</td><td>Verify journalist discovery returns sensible results</td><td>§6.4</td></tr><tr><td>5</td><td>Build the generate → review → launch flow, keeping <code>email_action</code> at <code>draft</code></td><td>§6.6</td></tr><tr><td>6</td><td>Add reply handling</td><td>§6.8, §11.3</td></tr><tr><td>7</td><td>Handle <code>is_contactable</code>, sender health, and rate limits</td><td>§4.8, §6.4, §8.4</td></tr><tr><td>8</td><td>Only then enable <code>email_action: "send"</code></td><td>§6.6</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th></th><th>Step</th><th>Section</th></tr></thead><tbody><tr><td>1</td><td>Confirm your key with <code>GET /me</code></td><td>§2.2</td></tr><tr><td>2</td><td>Populate the company profile, including at least one spokesperson</td><td>§6.2</td></tr><tr><td>3</td><td>Connect a sending mailbox</td><td>§8</td></tr><tr><td>4</td><td>Verify journalist discovery returns sensible results</td><td>§6.4</td></tr><tr><td>5</td><td>Build the generate → review → launch flow, keeping <code>email_action</code> at <code>draft</code></td><td>§6.6</td></tr><tr><td>6</td><td>Add reply handling</td><td>§6.8, §11.3</td></tr><tr><td>7</td><td>Handle <code>is_contactable</code>, sender health, and rate limits</td><td>§4.9, §6.4, §8.4</td></tr><tr><td>8</td><td>Only then enable <code>email_action: "send"</code></td><td>§6.6</td></tr></tbody></table></div>
 <p>Step 8 is deliberately last. Until that switch is flipped, no call in your integration can send email to a real journalist — which makes everything before it safe to test freely.</p>
 <hr>
 <h2 id="3-authentication-and-scopes"><span class="secnum">3</span>Authentication and scopes</h2>
@@ -342,13 +357,16 @@ Article ────────────── a published story</code></pre
 <div class="codewrap"><pre class="code"><code>Authorization: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f</code></pre></div>
 <p>Tokens are opaque strings — do not parse them. Treat a token as a full-account credential: store it in a secret manager, never in source control, never in client-side code, and never in a URL query string.</p>
 <p>If a token is exposed, contact us immediately for rotation (§13). Self-serve rotation is on the roadmap (§12).</p>
-<h3 id="3-2-one-key-one-account">3.2 One key, one account</h3>
-<p>Each key is bound to a single account. There is no cross-account access and no way to widen a key's reach.</p>
-<p>For a multi-brand integration, hold one key per brand and resolve the right key before each request. Confirm a key's account with <code>GET /me</code> when you first store it, and record the mapping on your side.</p>
+<h3 id="3-2-one-key-many-accounts">3.2 One key, many accounts</h3>
+<p>A key is issued to your <strong>partner</strong> and reaches every account under it. Add a brand and the same key works immediately.</p>
+<p>A key cannot reach outside its partner. There is no parameter, scope, or header that widens it, and requests for an account belonging to another partner return <code>404</code> rather than <code>403</code> — so the response cannot be used to discover whether an account exists.</p>
+<p><strong>Two operational consequences worth designing for.</strong> One credential covering a hundred brands is one credential worth stealing: keep it server-side only, and rotate it the moment you suspect exposure. And because scopes apply to the key rather than per account, <code>write:emails</code> grants sending for <em>every</em> brand under the partner — so if only part of your system should be able to send, use separate keys with different scopes rather than one key everywhere.</p>
+<p>Discover your accounts with <code>GET /me</code> at startup, and re-poll it periodically so brands provisioned later appear without a deploy.</p>
 <h3 id="3-3-scopes">3.3 Scopes</h3>
 <p>Keys carry scopes limiting what they can do. Scopes take the form <code>read:&lt;resource&gt;</code> or <code>write:&lt;resource&gt;</code>, with <code>read:all</code> and <code>write:all</code> as wildcards.</p>
 <div class="tablewrap"><table><thead><tr><th>Resource</th><th><code>read:</code></th><th><code>write:</code></th></tr></thead><tbody><tr><td><code>account</code></td><td>Company profile, spokespeople, competitors, analysis</td><td>Update profile, spokespeople, competitors</td></tr><tr><td><code>journalists</code></td><td>Search, retrieve, top and relevant journalists</td><td>—</td></tr><tr><td><code>publications</code></td><td>Publications and podcasts</td><td>—</td></tr><tr><td><code>articles</code></td><td>Story search, trending, relevant</td><td>—</td></tr><tr><td><code>campaigns</code></td><td>Campaigns, drafts, campaign ideas</td><td>Create drafts, launch, pause, delete</td></tr><tr><td><code>pitches</code></td><td>—</td><td>Generate pitch, subject line, follow-up, personalisation</td></tr><tr><td><code>emails</code></td><td>Sent, drafted, scheduled email and replies</td><td>Send, reply</td></tr><tr><td><code>interactions</code></td><td>Reply history</td><td>—</td></tr><tr><td><code>lists</code></td><td>Retrieve and search lists</td><td>Save lists</td></tr><tr><td><code>wire</code></td><td>Retrieve releases</td><td>Submit releases</td></tr><tr><td><code>senders</code></td><td>Mailbox status</td><td>Connect, disconnect</td></tr></tbody></table></div>
-<p><strong>Request the narrowest set that does the job.</strong> <code>write:emails</code> and <code>write:campaigns</code> are the two that cause real email to be sent — a service that only reads analytics should never hold them. If your architecture separates campaign preparation from dispatch, use separate keys with separate scopes so a bug in the preparation path cannot send.</p>
+<p><strong>Scopes apply to the key, across every account under your partner.</strong> There is no per-account scoping: a key with <code>write:emails</code> can send for all your brands, not a subset.</p>
+<p><strong>Request the narrowest set that does the job.</strong> <code>write:emails</code> and <code>write:campaigns</code> are the two that cause real email to be sent — a service that only reads analytics should never hold them. If your architecture separates campaign preparation from dispatch, use separate keys with separate scopes so a bug in the preparation path cannot send for any brand.</p>
 <p>A call missing a required scope returns <code>403</code> naming the scope needed. It does not return <code>404</code>.</p>
 <h3 id="3-4-key-states">3.4 Key states</h3>
 <div class="tablewrap"><table><thead><tr><th>State</th><th>Effect</th></tr></thead><tbody><tr><td><code>ACTIVE</code></td><td>Works normally.</td></tr><tr><td><code>PAUSED</code></td><td>All requests rejected with <code>403</code>. Reversible.</td></tr><tr><td><code>ARCHIVED</code></td><td>All requests rejected with <code>403</code>. Permanent.</td></tr></tbody></table></div>
@@ -378,13 +396,35 @@ Article ────────────── a published story</code></pre
 <p><code>snake_case</code> in all request and response bodies. Headers use standard <code>Kebab-Case</code>.</p>
 <h3 id="4-3-identifiers">4.3 Identifiers</h3>
 <p>Identifiers are integers, unique within their type.</p>
-<div class="tablewrap"><table><thead><tr><th>Identifier</th><th>Scope</th></tr></thead><tbody><tr><td><code>account_id</code></td><td>Derived from your key. You never send it.</td></tr><tr><td><code>journalist_id</code>, <code>publication_id</code>, <code>podcast_id</code>, <code>article_id</code></td><td>Global</td></tr><tr><td><code>campaign_id</code>, <code>draft_id</code>, <code>email_id</code>, <code>interaction_id</code>, <code>release_id</code>, <code>sender_id</code></td><td>Your account</td></tr></tbody></table></div>
-<p>Account-scoped identifiers are only resolvable with a key for that account. An identifier from another account returns <code>404</code>.</p>
+<div class="tablewrap"><table><thead><tr><th>Identifier</th><th>Scope</th></tr></thead><tbody><tr><td><code>partner_id</code></td><td>Your organisation. Returned by <code>GET /me</code>; never sent.</td></tr><tr><td><code>account_id</code></td><td>The brand you are acting on. <strong>Required on most requests.</strong> Must be an account under your partner.</td></tr><tr><td><code>journalist_id</code>, <code>publication_id</code>, <code>podcast_id</code>, <code>article_id</code></td><td>Global</td></tr><tr><td><code>campaign_id</code>, <code>draft_id</code>, <code>email_id</code>, <code>interaction_id</code>, <code>release_id</code>, <code>sender_id</code></td><td>Your account</td></tr></tbody></table></div>
+<p>Account-scoped identifiers resolve only within the account named by <code>account_id</code>. An identifier from a different account — even another of your own brands — returns <code>404</code>. Objects are never shared between accounts, so a <code>campaign_id</code> from one brand is meaningless against another.</p>
 <p>Wire releases additionally carry a <code>guid</code> UUID, used for de-duplication by downstream distribution.</p>
-<h3 id="4-4-timestamps">4.4 Timestamps</h3>
+<h3 id="4-4-the-account-id-parameter">4.4 The <code>account_id</code> parameter</h3>
+<p><strong>Every endpoint except <code>GET /me</code> requires an <code>account_id</code></strong> naming the brand you are acting on. It is the one parameter shared by the whole API, so it is documented here rather than repeated in every schema below.</p>
+<div class="tablewrap"><table><thead><tr><th>Method</th><th>Where it goes</th></tr></thead><tbody><tr><td><code>POST</code></td><td>A top-level field in the JSON body</td></tr><tr><td><code>GET</code>, <code>PATCH</code>, <code>DELETE</code></td><td>A query parameter — <code>?account_id=4821</code></td></tr></tbody></table></div>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/relevant</span>
+<span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f
+<span class="k">Content-Type</span>: application/json
+
+{
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
+  <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall in logistics..."</span>,
+  <span class="k">"page_size"</span>: <span class="n">25</span>
+}</code></pre></div>
+<p>Endpoint schemas in §6 omit <code>account_id</code> for brevity. It is required on all of them.</p>
+<p><strong>Failure modes</strong></p>
+<div class="tablewrap"><table><thead><tr><th>Condition</th><th>Response</th></tr></thead><tbody><tr><td>Omitted</td><td><code>400 validation_error</code> naming <code>account_id</code></td></tr><tr><td>Not a positive integer</td><td><code>400 validation_error</code></td></tr><tr><td>Does not exist, or belongs to another partner</td><td><code>404 account_not_found</code></td></tr></tbody></table></div>
+<p>The last row is deliberate: a nonexistent account and one you simply do not own are indistinguishable in the response, so the API cannot be used to enumerate other partners' accounts.</p>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"error"</span>: <span class="s">"No account 9137 is available to this API key."</span>,
+  <span class="k">"code"</span>: <span class="s">"account_not_found"</span>,
+  <span class="k">"request_id"</span>: <span class="s">"req_7e3c92a51f8b4d06"</span>
+}</code></pre></div>
+<p><strong>Objects are scoped to their account.</strong> A <code>campaign_id</code>, <code>draft_id</code>, <code>email_id</code> or <code>interaction_id</code> from one brand does not resolve against another — mismatches return <code>404 not_found</code>. Store the account alongside any identifier you cache.</p>
+<h3 id="4-5-timestamps">4.5 Timestamps</h3>
 <p>ISO 8601 UTC with a <code>Z</code> suffix: <code>2026-08-18T09:15:47Z</code>. Fields ending <code>_at</code> are timestamps; fields ending <code>_date</code> are calendar dates (<code>2026-08-18</code>) where time of day carries no meaning.</p>
 <p><strong>One deliberate exception.</strong> Wire release scheduling takes a wall-clock <code>date</code>, <code>time</code> and IANA <code>timezone</code> separately, because a press release goes out at 9am <em>in a named city</em>, not at a UTC instant. See §6.9.</p>
-<h3 id="4-5-pagination">4.5 Pagination</h3>
+<h3 id="4-6-pagination">4.6 Pagination</h3>
 <p>List endpoints are page-based.</p>
 <div class="tablewrap"><table><thead><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Maximum</th></tr></thead><tbody><tr><td><code>page</code></td><td>integer</td><td>1</td><td>—</td></tr><tr><td><code>page_size</code></td><td>integer</td><td>10–50 by endpoint</td><td>100</td></tr></tbody></table></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
@@ -397,7 +437,7 @@ Article ────────────── a published story</code></pre
 }</code></pre></div>
 <p><code>total</code> is a real count, so page count is <code>ceil(total / page_size)</code>.</p>
 <p><strong>When paginating a set that changes underneath you</strong> — new stories arriving, new replies landing — page boundaries can shift, so a row may repeat or be skipped. For a stable pass over data, filter by an explicit date range rather than relying on page numbers alone, and de-duplicate on ID as you collect.</p>
-<h3 id="4-6-response-envelope">4.6 Response envelope</h3>
+<h3 id="4-7-response-envelope">4.7 Response envelope</h3>
 <p>Success is always an object with a <code>data</code> key:</p>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"campaign_id"</span>: <span class="n">33914</span> } }</code></pre></div>
 <p>Never a bare array or scalar, so top-level fields can be added without breaking your parser.</p>
@@ -409,7 +449,7 @@ Article ────────────── a published story</code></pre
 <li><strong>Opt-in expansion.</strong> Lists return lean objects; related data is requested explicitly with flags like <code>include_articles</code>. Expansions cost latency — request them only when you will render them.</li>
 <li><strong>Display copy is marked.</strong> Fields marked <strong>Display copy</strong> are human-readable and safe to render. Everything else is for logic.</li>
 </ul>
-<h3 id="4-7-errors">4.7 Errors</h3>
+<h3 id="4-8-errors">4.8 Errors</h3>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
   <span class="k">"error"</span>: <span class="s">"Validation error"</span>,
   <span class="k">"code"</span>: <span class="s">"validation_error"</span>,
@@ -420,9 +460,9 @@ Article ────────────── a published story</code></pre
 }</code></pre></div>
 <div class="tablewrap"><table><thead><tr><th>Field</th><th>Notes</th></tr></thead><tbody><tr><td><code>error</code></td><td>Human-readable. For logs and diagnostics. <strong>Do not branch on this text</strong> — wording may change at any time.</td></tr><tr><td><code>code</code></td><td>Stable and machine-readable. <strong>Branch on this.</strong></td></tr><tr><td><code>request_id</code></td><td>Present on every response. <strong>Quote it in any support request.</strong></td></tr><tr><td><code>details</code></td><td>Field-level errors on validation failures. <code>path</code> is the dotted field path.</td></tr></tbody></table></div>
 <p><strong>Error codes</strong></p>
-<div class="tablewrap"><table><thead><tr><th>HTTP</th><th><code>code</code></th><th>Retry</th><th>Meaning</th></tr></thead><tbody><tr><td>400</td><td><code>validation_error</code></td><td>No</td><td>Schema violation; see <code>details</code></td></tr><tr><td>400</td><td><code>invalid_request</code></td><td>No</td><td>Well-formed but not actionable</td></tr><tr><td>401</td><td><code>missing_credentials</code></td><td>No</td><td>No <code>Authorization</code> header</td></tr><tr><td>401</td><td><code>invalid_token</code></td><td>No</td><td>Token not recognised</td></tr><tr><td>403</td><td><code>key_inactive</code></td><td>No</td><td>Key is paused or archived</td></tr><tr><td>403</td><td><code>insufficient_scope</code></td><td>No</td><td>Key lacks the required scope</td></tr><tr><td>404</td><td><code>not_found</code></td><td>No</td><td>No such object in your account</td></tr><tr><td>405</td><td><code>method_not_allowed</code></td><td>No</td><td>See the <code>Allow</code> header</td></tr><tr><td>409</td><td><code>invalid_state_transition</code></td><td>No</td><td>For example, pausing a deleted campaign</td></tr><tr><td>422</td><td><code>no_valid_sender</code></td><td>No</td><td>No connected mailbox — see §8</td></tr><tr><td>422</td><td><code>no_contactable_recipients</code></td><td>No</td><td>No target has a usable contact route</td></tr><tr><td>429</td><td><code>rate_limited</code></td><td><strong>Yes</strong></td><td>See §4.8</td></tr><tr><td>500</td><td><code>internal_error</code></td><td><strong>Yes</strong></td><td>Report with <code>request_id</code></td></tr><tr><td>503</td><td><code>service_unavailable</code></td><td><strong>Yes</strong></td><td>Temporary. Honour <code>Retry-After</code>.</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>HTTP</th><th><code>code</code></th><th>Retry</th><th>Meaning</th></tr></thead><tbody><tr><td>400</td><td><code>validation_error</code></td><td>No</td><td>Schema violation; see <code>details</code></td></tr><tr><td>400</td><td><code>invalid_request</code></td><td>No</td><td>Well-formed but not actionable</td></tr><tr><td>401</td><td><code>missing_credentials</code></td><td>No</td><td>No <code>Authorization</code> header</td></tr><tr><td>401</td><td><code>invalid_token</code></td><td>No</td><td>Token not recognised</td></tr><tr><td>403</td><td><code>key_inactive</code></td><td>No</td><td>Key is paused or archived</td></tr><tr><td>403</td><td><code>insufficient_scope</code></td><td>No</td><td>Key lacks the required scope</td></tr><tr><td>404</td><td><code>not_found</code></td><td>No</td><td>No such object in the account you named</td></tr><tr><td>404</td><td><code>account_not_found</code></td><td>No</td><td>The <code>account_id</code> does not exist, or is not under your partner</td></tr><tr><td>405</td><td><code>method_not_allowed</code></td><td>No</td><td>See the <code>Allow</code> header</td></tr><tr><td>409</td><td><code>invalid_state_transition</code></td><td>No</td><td>For example, pausing a deleted campaign</td></tr><tr><td>422</td><td><code>no_valid_sender</code></td><td>No</td><td>No connected mailbox — see §8</td></tr><tr><td>422</td><td><code>no_contactable_recipients</code></td><td>No</td><td>No target has a usable contact route</td></tr><tr><td>429</td><td><code>rate_limited</code></td><td><strong>Yes</strong></td><td>See §4.9</td></tr><tr><td>500</td><td><code>internal_error</code></td><td><strong>Yes</strong></td><td>Report with <code>request_id</code></td></tr><tr><td>503</td><td><code>service_unavailable</code></td><td><strong>Yes</strong></td><td>Temporary. Honour <code>Retry-After</code>.</td></tr></tbody></table></div>
 <p>Retry only <code>429</code>, <code>500</code> and <code>503</code>. Retrying a <code>4xx</code> will fail identically.</p>
-<h3 id="4-8-rate-limits">4.8 Rate limits</h3>
+<h3 id="4-9-rate-limits">4.9 Rate limits</h3>
 <p><strong>100 requests per minute per API key.</strong></p>
 <div class="codewrap"><pre class="code"><code>X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 73</code></pre></div>
@@ -432,10 +472,10 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"error"</span>: <span class="s">"Rate limit exceeded. Try again later."</span>, <span class="k">"code"</span>: <span class="s">"rate_limited"</span>, <span class="k">"request_id"</span>: <span class="s">"req_6d1a93f7c4e08b25"</span> }</code></pre></div>
 <p><strong>Required client behaviour:</strong> honour <code>Retry-After</code>, then exponential backoff with jitter — <code>sleep = random(0, min(60, 2^attempt))</code> seconds. Never retry in a tight loop.</p>
 <p><strong>Budget for generation, not for reads.</strong> Read endpoints are cheap and 100/minute is generous. The generation endpoints in §6.5 take seconds each, so in practice concurrency and latency constrain you well before the request limit does. Queue generation work on your side rather than firing it in parallel bursts.</p>
-<h3 id="4-9-request-size">4.9 Request size</h3>
+<h3 id="4-10-request-size">4.10 Request size</h3>
 <div class="tablewrap"><table><thead><tr><th>Limit</th><th>Value</th></tr></thead><tbody><tr><td>Standard request body</td><td>1 MB</td></tr><tr><td>Campaign and wire endpoints</td><td>25 MB</td></tr><tr><td>Journalist IDs per lookup</td><td>100</td></tr><tr><td>Journalists per personalisation call</td><td>50</td></tr></tbody></table></div>
 <p>Attachments are base64-encoded inline in the request body, which is why campaign and wire endpoints allow 25 MB. Base64 adds roughly 33% overhead, so a 25 MB body carries about 18 MB of file.</p>
-<h3 id="4-10-required-headers">4.10 Required headers</h3>
+<h3 id="4-11-required-headers">4.11 Required headers</h3>
 <div class="tablewrap"><table><thead><tr><th>Header</th><th>Required</th><th>Notes</th></tr></thead><tbody><tr><td><code>Authorization</code></td><td>Always</td><td><code>Bearer &lt;token&gt;</code></td></tr><tr><td><code>Content-Type</code></td><td>On writes</td><td><code>application/json</code></td></tr><tr><td><code>User-Agent</code></td><td>Always</td><td>Identify your integration, e.g. <code>NorthwindPR/2.1</code>. Helps us help you.</td></tr></tbody></table></div>
 <hr>
 <h2 id="5-timing-and-long-running-work"><span class="secnum">5</span>Timing and long-running work</h2>
@@ -519,6 +559,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"company_blurb"</span>: <span class="s">"Northwind Robotics builds autonomous mobile robots for mid-market distribution centres, including a cold-chain line rated to -20C."</span>,
   <span class="k">"keywords"</span>: [<span class="s">"autonomous mobile robots"</span>, <span class="s">"refrigerated warehouse"</span>, <span class="s">"3PL automation"</span>, <span class="s">"cold chain robotics"</span>],
   <span class="k">"notes"</span>: <span class="s">"Series B announced August 2026. Cold-chain line GA in Q4."</span>
@@ -552,7 +593,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
   <span class="k">"is_primary"</span>: <span class="b">false</span>
 }</code></pre></div>
 <p>Competitors use <code>PUT</code> with the complete list — the call replaces the whole set rather than merging:</p>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"competitors"</span>: [<span class="s">"Locus Robotics"</span>, <span class="s">"6 River Systems"</span>, <span class="s">"Fetch Robotics"</span>] }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"competitors"</span>: [<span class="s">"Locus Robotics"</span>, <span class="s">"6 River Systems"</span>, <span class="s">"Fetch Robotics"</span>] }</code></pre></div>
 <hr>
 <h3 id="6-3-brand-analysis">6.3 Brand analysis</h3>
 <h4 id="get-api-v1-account-analysis" class="endpoint"><span class="method m-get">GET</span><code class="path">/api/v1/account/analysis</code></h4>
@@ -786,7 +827,12 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <h4 id="post-api-v1-journalists-lookup" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/journalists/lookup</code></h4>
 <p>Retrieve specific journalists by ID.</p>
 <div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:journalists</code></td></tr><tr><td><strong>Typical latency</strong></td><td>200 ms</td></tr></tbody></table></div>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>, <span class="n">90233</span>], <span class="k">"include_articles"</span>: <span class="b">true</span>, <span class="k">"include_interactions"</span>: <span class="b">true</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
+  <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>, <span class="n">90233</span>],
+  <span class="k">"include_articles"</span>: <span class="b">true</span>,
+  <span class="k">"include_interactions"</span>: <span class="b">true</span>
+}</code></pre></div>
 <p>1–100 IDs per call.</p>
 <p><strong>Use this to refresh anything you cache.</strong> <code>is_contactable</code> changes without notice as delivery failures and opt-outs occur, so a cached <code>true</code> can be stale. Re-check before a campaign rather than trusting stored data.</p>
 <hr>
@@ -795,7 +841,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <p>Top stories from a recent window — the entry point for timely, newsjacking outreach.</p>
 <div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>read:articles</code></td></tr><tr><td><strong>Typical latency</strong></td><td>400 ms</td></tr></tbody></table></div>
 <div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Notes</th></tr></thead><tbody><tr><td><code>lookback_hours</code></td><td>integer</td><td>168</td><td><strong>Use <code>72</code> for the last three days</strong></td></tr><tr><td><code>search_term</code></td><td>string</td><td>—</td><td>Narrow the results</td></tr></tbody></table></div>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"lookback_hours"</span>: <span class="n">72</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"lookback_hours"</span>: <span class="n">72</span> }</code></pre></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
   <span class="k">"data"</span>: {
     <span class="k">"top_stories"</span>: [
@@ -847,14 +893,18 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <p><strong><code>{{first_name}}</code> is a dynamic tag</strong> replaced per recipient at send time. Retrieve the supported set from <code>GET /api/v1/pitches/tags</code>. <strong>Preserve tags exactly when your users edit copy</strong> — a malformed tag is sent literally, which is an embarrassing failure in front of a journalist. Validate tags before accepting an edit.</p>
 <h4 id="post-api-v1-pitches-subject-line" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/pitches/subject-line</code></h4>
 <div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>4 s</td></tr></tbody></table></div>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall in logistics..."</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall in logistics..."</span> }</code></pre></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span> } }</code></pre></div>
 <p>Returns one subject line. Call again for alternatives.</p>
 <h4 id="post-api-v1-pitches-personalize" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/pitches/personalize</code></h4>
 <p>Per-journalist opening lines referencing that journalist's recent work.</p>
 <div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>15 s, up to 45 s</td></tr></tbody></table></div>
 <div class="tablewrap"><table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr></thead><tbody><tr><td><code>pitch</code></td><td>string</td><td><strong>Yes</strong></td><td>The shared pitch body</td></tr><tr><td><code>journalist_ids</code></td><td>array of integer</td><td><strong>Yes</strong></td><td>1–50</td></tr></tbody></table></div>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>, <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>, <span class="n">90233</span>] }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
+  <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>,
+  <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>, <span class="n">90233</span>]
+}</code></pre></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
   <span class="k">"data"</span>: {
     <span class="k">"personalizations"</span>: [
@@ -872,7 +922,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <p><strong>Batch 10–20 at a time</strong>, not the full 50. See §5.2.</p>
 <h4 id="post-api-v1-pitches-follow-up" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/pitches/follow-up</code></h4>
 <div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:pitches</code></td></tr><tr><td><strong>Typical latency</strong></td><td>6 s</td></tr></tbody></table></div>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span> }</code></pre></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"data"</span>: { <span class="k">"follow_up"</span>: <span class="s">"Following up briefly — the cold-chain deployment data I mentioned is ready if it's useful. Happy to send it over regardless of timing on your end.\n\nBest,\nPriya"</span> } }</code></pre></div>
 <p>Pass the result as <code>follow_up</code> when creating a campaign.</p>
 <hr>
@@ -987,7 +1037,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <p>The journalists actually targeted, with per-journalist status. <strong>Call this after launch</strong> to reconcile requested against resolved recipients and show your users the real number.</p>
 <h4 id="patch-api-v1-campaigns-campaign-id" class="endpoint"><span class="method m-patch">PATCH</span><code class="path">/api/v1/campaigns/{campaign_id}</code></h4>
 <div class="tablewrap meta"><table><tbody><tr><td><strong>Scope</strong></td><td><code>write:campaigns</code></td></tr><tr><td><strong>Typical latency</strong></td><td>200 ms</td></tr></tbody></table></div>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"status"</span>: <span class="s">"PAUSED"</span> }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"status"</span>: <span class="s">"PAUSED"</span> }</code></pre></div>
 <p>Accepts <code>ACTIVE</code>, <code>PAUSED</code>, <code>DELETED</code>.</p>
 <div class="tablewrap"><table><thead><tr><th>Transition</th><th>Effect</th></tr></thead><tbody><tr><td>→ <code>PAUSED</code></td><td>Halts pending sends. Already-sent email cannot be recalled. Replies still arrive.</td></tr><tr><td>→ <code>ACTIVE</code></td><td>Resumes sending.</td></tr><tr><td>→ <code>DELETED</code></td><td><strong>Terminal.</strong> Cancels pending sends and removes associated email records.</td></tr></tbody></table></div>
 <p>There is no separate cancel operation — <code>DELETED</code> is cancellation.</p>
@@ -1020,7 +1070,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <p>All accept <code>journalist_id</code>, an ID filter, and <code>date_range</code>.</p>
 <h4 id="post-api-v1-interactions" class="endpoint"><span class="method m-post">POST</span><code class="path">/api/v1/interactions</code></h4>
 <p><strong>This is how you learn a journalist replied.</strong></p>
-<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"date_range"</span>: { <span class="k">"start_date"</span>: <span class="s">"2026-08-18"</span>, <span class="k">"end_date"</span>: <span class="s">"2026-08-20"</span> } }</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"date_range"</span>: { <span class="k">"start_date"</span>: <span class="s">"2026-08-18"</span>, <span class="k">"end_date"</span>: <span class="s">"2026-08-20"</span> } }</code></pre></div>
 <div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
   <span class="k">"data"</span>: {
     <span class="k">"interactions"</span>: [
@@ -1252,7 +1302,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <p><strong>1. Confirm your key.</strong></p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/me</span>
 <span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f</code></pre></div>
-<p>Record <code>account_id</code> against your own brand record.</p>
+<p>Cache the returned <code>accounts</code> list against your own brand records. Every later call names one of these accounts via <code>account_id</code> (§4.4). Re-poll periodically so newly provisioned brands appear without a deploy.</p>
 <p><strong>2. Read the profile.</strong></p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/account/profile</span></code></pre></div>
 <p><strong>3. Enrich it.</strong> The highest-leverage call in your integration.</p>
@@ -1260,6 +1310,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"company_blurb"</span>: <span class="s">"Northwind Robotics builds autonomous mobile robots for mid-market distribution centres, including a cold-chain line rated to -20C."</span>,
   <span class="k">"areas_of_expertise"</span>: [<span class="s">"Warehouse automation"</span>, <span class="s">"Cold-chain logistics"</span>, <span class="s">"Autonomous mobile robots"</span>],
   <span class="k">"themes"</span>: [<span class="s">"Supply chain"</span>, <span class="s">"Robotics"</span>, <span class="s">"Labour economics"</span>],
@@ -1279,7 +1330,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/top</span>
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
 <p>Render in the order returned. <strong>Exclude <code>is_contactable: false</code>.</strong></p>
 <hr>
 <h3 id="11-2-press-release-to-launched-campaign">11.2 Press release to launched campaign</h3>
@@ -1289,6 +1340,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"headline"</span>: <span class="s">"Northwind Robotics Raises $42M Series B to Expand Cold-Chain Automation"</span>,
   <span class="k">"content"</span>: <span class="s">"**PORTLAND, Ore.** — Northwind Robotics today announced a $42 million Series B financing led by Cascadia Ventures..."</span>,
   <span class="k">"categories"</span>: [<span class="s">"Business &amp;amp; Economy"</span>, <span class="s">"Technology"</span>],
@@ -1308,7 +1360,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/pitches/subject-line</span>
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span> }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span> }</code></pre></div>
 <p><strong>4. Find journalists for this pitch</strong> — tighter than brand-level matching.</p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/relevant</span>
 <span class="k">Content-Type</span>: application/json
@@ -1327,6 +1379,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"name"</span>: <span class="s">"Series B — cold-chain angle"</span>,
   <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>,
   <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span>,
@@ -1342,6 +1395,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"name"</span>: <span class="s">"Series B — cold-chain angle"</span>,
   <span class="k">"pitch"</span>: <span class="s">"Refrigerated warehouses have the sharpest labour shortfall..."</span>,
   <span class="k">"subject_line"</span>: <span class="s">"Why warehouse robots fail below freezing"</span>,
@@ -1365,7 +1419,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/interactions</span>
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"date_range"</span>: { <span class="k">"start_date"</span>: <span class="s">"2026-08-19"</span>, <span class="k">"end_date"</span>: <span class="s">"2026-08-19"</span> } }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"date_range"</span>: { <span class="k">"start_date"</span>: <span class="s">"2026-08-19"</span>, <span class="k">"end_date"</span>: <span class="s">"2026-08-19"</span> } }</code></pre></div>
 <p><strong>2. De-duplicate on <code>interaction_id</code></strong> before processing.</p>
 <p><strong>3. Route on <code>type</code></strong> using the table in §6.8. Include a default branch for unrecognised values.</p>
 <p><strong>4. Act on <code>UNSUBSCRIBED</code> immediately</strong> — record the opt-out in your own system on this pass.</p>
@@ -1373,12 +1427,13 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/emails/sent</span>
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"journalist_id"</span>: <span class="n">88412</span> }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"journalist_id"</span>: <span class="n">88412</span> }</code></pre></div>
 <p><strong>6. Reply.</strong></p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/emails/884120/reply</span>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"interaction_id"</span>: <span class="n">55120</span>,
   <span class="k">"email_body"</span>: <span class="s">"Adaeze — Thursday 9am Pacific works for Dana. I'll send the deployment data with turnover figures this afternoon.\n\nPriya"</span>
 }</code></pre></div>
@@ -1391,23 +1446,24 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/stories/trending</span>
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"lookback_hours"</span>: <span class="n">72</span> }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"lookback_hours"</span>: <span class="n">72</span> }</code></pre></div>
 <p><strong>2. Resolve the byline.</strong></p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/articles/lookup</span>
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"article_ids"</span>: [<span class="n">991204</span>] }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"article_ids"</span>: [<span class="n">991204</span>] }</code></pre></div>
 <p><strong>3. Check contactability and prior history.</strong></p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/lookup</span>
 <span class="k">Content-Type</span>: application/json
 
-{ <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>], <span class="k">"include_interactions"</span>: <span class="b">true</span> }</code></pre></div>
+{ <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"journalist_ids"</span>: [<span class="n">88412</span>], <span class="k">"include_interactions"</span>: <span class="b">true</span> }</code></pre></div>
 <p><code>include_interactions</code> shows existing conversations, so you do not pitch someone mid-thread.</p>
 <p><strong>4. Generate the email.</strong></p>
 <div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/outreach/generate</span>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
   <span class="k">"email_type"</span>: <span class="s">"ARTICLE_FOLLOW_UP"</span>,
   <span class="k">"article_ids"</span>: [<span class="n">991204</span>],
@@ -1418,11 +1474,43 @@ X-RateLimit-Remaining: 73</code></pre></div>
 <span class="k">Content-Type</span>: application/json
 
 {
+  <span class="k">"account_id"</span>: <span class="n">4821</span>,
   <span class="k">"journalist_id"</span>: <span class="n">88412</span>,
   <span class="k">"subject_line"</span>: <span class="s">"Your cold storage staffing piece — operator data available"</span>,
   <span class="k">"email_body"</span>: <span class="s">"Hi Adaeze,\n\nYour piece on widening staffing gaps in cold storage matched what we see operationally...\n\nBest,\nPriya"</span>
 }</code></pre></div>
 <p>This sends immediately — there is no draft state on this endpoint.</p>
+<hr>
+<h3 id="11-5-operate-many-brands-from-one-integration">11.5 Operate many brands from one integration</h3>
+<p>The pattern for an agency or multi-product partner. One credential, many brands.</p>
+<p><strong>1. Discover your accounts at startup.</strong></p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">GET</span> <span class="u">/api/v1/me</span>
+<span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f</code></pre></div>
+<div class="codewrap"><span class="codelabel">JSON</span><pre class="code"><code>{
+  <span class="k">"data"</span>: {
+    <span class="k">"partner_id"</span>: <span class="n">118</span>,
+    <span class="k">"partner_name"</span>: <span class="s">"Northwind PR Group"</span>,
+    <span class="k">"accounts"</span>: [
+      { <span class="k">"account_id"</span>: <span class="n">4821</span>, <span class="k">"account_name"</span>: <span class="s">"Northwind Robotics"</span> },
+      { <span class="k">"account_id"</span>: <span class="n">4822</span>, <span class="k">"account_name"</span>: <span class="s">"Cascade Cold Chain"</span> },
+      { <span class="k">"account_id"</span>: <span class="n">4823</span>, <span class="k">"account_name"</span>: <span class="s">"Tallwood Freight"</span> }
+    ],
+    <span class="k">"total"</span>: <span class="n">3</span>,
+    <span class="k">"page"</span>: <span class="n">1</span>,
+    <span class="k">"page_size"</span>: <span class="n">50</span>
+  }
+}</code></pre></div>
+<p><strong>2. Map accounts to your own tenants.</strong> Store <code>account_id</code> against whatever you call a client or workspace. This mapping is the security boundary in your system — see step 4.</p>
+<p><strong>3. Name the brand on every call.</strong> Same key throughout; only <code>account_id</code> changes.</p>
+<div class="codewrap"><span class="codelabel">HTTP</span><pre class="code"><code><span class="m">POST</span> <span class="u">/api/v1/journalists/top</span>
+<span class="k">Authorization</span>: Bearer 8f2c47a19e3d5b06c81f92e3b7d54c4f
+<span class="k">Content-Type</span>: application/json
+
+{ <span class="k">"account_id"</span>: <span class="n">4822</span>, <span class="k">"include_articles"</span>: <span class="b">true</span> }</code></pre></div>
+<p><strong>4. Resolve <code>account_id</code> server-side, never from the client.</strong> Derive it from the authenticated user's own entitlements in your system. Accepting it from a browser request would let one of your customers read or send on behalf of another's brand — the API cannot catch that, because both accounts are legitimately yours.</p>
+<p><strong>5. Re-poll <code>GET /me</code> on a schedule.</strong> Daily is ample. New brands provisioned by your account manager appear automatically, with no key change and no deploy.</p>
+<p><strong>6. Keep per-brand state separate in your own storage.</strong> Campaign, draft, email and interaction identifiers resolve only within their own account (§4.4). Store the account alongside every identifier you cache, and never reuse one across brands.</p>
+<p><strong>7. Rate limits are per key, not per account.</strong> The 100 requests/minute in §4.9 is shared across every brand you operate. If you run scheduled work across many accounts, stagger it rather than fanning out in parallel — and ask us for a second key if a batch workload would otherwise starve your interactive traffic.</p>
 <hr>
 <h2 id="12-availability-and-roadmap"><span class="secnum">12</span>Availability and roadmap</h2>
 <p>Everything documented in §6 is available in <code>v1</code> unless listed below.</p>
@@ -1441,7 +1529,7 @@ X-RateLimit-Remaining: 73</code></pre></div>
 </ul>
 <h3 id="planned">Planned</h3>
 <p>Listed with what changes for you. Dates are shared through your account manager rather than committed here.</p>
-<div class="tablewrap"><table><thead><tr><th>Capability</th><th>What it gives you</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Outbound webhooks</strong></td><td>Replies and email events pushed to your endpoint instead of polled</td><td>Signed, with retries and delivery logs. See §7 for how to structure code now so this is a swap, not a rewrite.</td></tr><tr><td><strong>API-initiated brand analysis</strong></td><td>Start an analysis from your product and poll a job resource</td><td>Removes the current dependency on the platform interface (§5.3)</td></tr><tr><td><strong>Self-serve key management</strong></td><td>Create, list, rotate and revoke keys programmatically</td><td>Rotation with an overlap window, so credentials roll without downtime</td></tr><tr><td><strong>Test mode</strong></td><td>Exercise the full flow, including sends, against test data with no real email</td><td>Until this ships, use <code>email_action: "draft"</code> — see the guidance below</td></tr><tr><td><strong>Idempotency keys</strong></td><td>Safe retries on campaign launch and send</td><td>Removes the check-before-retry step in §6.7</td></tr><tr><td><strong>Scheduled campaign launch</strong></td><td>Set a future send time via the API</td><td>Currently scheduled sends are configured in the platform interface</td></tr><tr><td><strong>Suppression list API</strong></td><td>Read and write the suppression list directly</td><td>Today, <code>is_contactable</code> reflects platform-side suppression</td></tr><tr><td><strong>Delivery and complaint events</strong></td><td><code>delivered</code> and <code>complaint</code> alongside sent, opened, clicked, bounced, replied</td><td>Not currently reported; do not build logic expecting them</td></tr><tr><td><strong>Bulk endpoints</strong></td><td>Batch operations for high-volume onboarding</td><td>Tell us your volumes so we can size this</td></tr><tr><td><strong>Self-serve account provisioning</strong></td><td>Create brand accounts programmatically</td><td>For partners managing many client brands</td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Capability</th><th>What it gives you</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Outbound webhooks</strong></td><td>Replies and email events pushed to your endpoint instead of polled</td><td>Signed, with retries and delivery logs. See §7 for how to structure code now so this is a swap, not a rewrite.</td></tr><tr><td><strong>API-initiated brand analysis</strong></td><td>Start an analysis from your product and poll a job resource</td><td>Removes the current dependency on the platform interface (§5.3)</td></tr><tr><td><strong>Self-serve key management</strong></td><td>Create, list, rotate and revoke keys programmatically</td><td>Rotation with an overlap window, so credentials roll without downtime</td></tr><tr><td><strong>Test mode</strong></td><td>Exercise the full flow, including sends, against test data with no real email</td><td>Until this ships, use <code>email_action: "draft"</code> — see the guidance below</td></tr><tr><td><strong>Idempotency keys</strong></td><td>Safe retries on campaign launch and send</td><td>Removes the check-before-retry step in §6.7</td></tr><tr><td><strong>Scheduled campaign launch</strong></td><td>Set a future send time via the API</td><td>Currently scheduled sends are configured in the platform interface</td></tr><tr><td><strong>Suppression list API</strong></td><td>Read and write the suppression list directly</td><td>Today, <code>is_contactable</code> reflects platform-side suppression</td></tr><tr><td><strong>Delivery and complaint events</strong></td><td><code>delivered</code> and <code>complaint</code> alongside sent, opened, clicked, bounced, replied</td><td>Not currently reported; do not build logic expecting them</td></tr><tr><td><strong>Bulk endpoints</strong></td><td>Batch operations for high-volume onboarding</td><td>Tell us your volumes so we can size this</td></tr><tr><td><strong>Self-serve account provisioning</strong></td><td>Create brand accounts under your partner programmatically, without waiting on us</td><td>Your existing key reaches each new account immediately</td></tr></tbody></table></div>
 <h3 id="testing-safely-before-test-mode-exists">Testing safely before test mode exists</h3>
 <p>Until test mode ships, this is how to build and test without risk:</p>
 <ol>
